@@ -1,8 +1,7 @@
 VERSION = 3
 PATCHLEVEL = 0
-SUBLEVEL = 60
+SUBLEVEL = 61
 EXTRAVERSION =
-NAME = Sneaky Weasel
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
