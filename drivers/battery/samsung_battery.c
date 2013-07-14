@@ -46,8 +46,9 @@
 #endif
 #ifdef CONFIG_FORCE_FAST_CHARGE
 #include <linux/fastchg.h>
-int ac_charge_level = AC_CHARGE_1000;  /* Start using default value */
-int usb_charge_level = USB_CHARGE_475; /* Start using default value */
+int ac_charge_level	  = AC_CHARGE_1000;	 /* Start using default value */
+int usb_charge_level	  = USB_CHARGE_475;	 /* Start using default value */
+int wireless_charge_level = WIRELESS_CHARGE_475; /* Start using default value */
 #endif
 
 static char *supply_list[] = {
@@ -1761,6 +1762,25 @@ charge_ok:
 	case POWER_SUPPLY_TYPE_WIRELESS:
 		if (!info->pdata->suspend_chging)
 			wake_lock(&info->charge_wake_lock);
+#ifdef CONFIG_FORCE_FAST_CHARGE
+		switch (force_fast_charge) {
+
+			/* If we are in substitution mode, set AC charge current for wireless */
+			case FAST_CHARGE_FORCE_AC:
+				battery_charge_control(info, info->pdata->chg_curr_ta,
+								info->pdata->in_curr_limit);
+				break;
+			/* If we are in custom mA mode, set user requested charge current for wireless */
+			case FAST_CHARGE_FORCE_CUSTOM_MA:
+				battery_charge_control(info, wireless_charge_level,
+								wireless_charge_level);
+				break;
+			/* If fast charge is disabled or in substitution mode, set stock charge current */
+			default:
+				battery_charge_control(info, info->pdata->chg_curr_wpc,
+								info->pdata->chg_curr_wpc);
+		}
+#else
 		battery_charge_control(info, info->pdata->chg_curr_wpc,
 						info->pdata->chg_curr_wpc);
 		break;
