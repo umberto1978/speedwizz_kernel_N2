@@ -1386,7 +1386,7 @@ static int pm_notifier_call(struct notifier_block *this,
 	return NOTIFY_DONE;
 }
 
-static struct notifier_block pm_notifier = {
+static __maybe_unused struct notifier_block pm_notifier = {
 	.notifier_call = pm_notifier_call,
 };
 

@@ -423,7 +423,7 @@ static void max77693_set_charger_state(struct max77693_charger_data *chg_data,
 	max77693_write_reg(i2c, MAX77693_CHG_REG_CHG_CNFG_00, reg_data);
 }
 
-static void max77693_set_buck(struct max77693_charger_data *chg_data,
+/* static void max77693_set_buck(struct max77693_charger_data *chg_data,
 							int enable)
 {
 	struct i2c_client *i2c = chg_data->max77693->i2c;
@@ -439,7 +439,7 @@ static void max77693_set_buck(struct max77693_charger_data *chg_data,
 
 	pr_debug("%s: CHG_CNFG_00(0x%02x)\n", __func__, reg_data);
 	max77693_write_reg(i2c, MAX77693_CHG_REG_CHG_CNFG_00, reg_data);
-}
+} */
 
 int max77693_get_input_current(struct max77693_charger_data *chg_data)
 {

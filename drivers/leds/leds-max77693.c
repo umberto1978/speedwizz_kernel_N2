@@ -99,7 +99,7 @@ static int max77693_set_bits(struct i2c_client *client, const u8 reg,
 	return ret;
 }
 
-static void print_all_reg_value(struct i2c_client *client)
+/* static void print_all_reg_value(struct i2c_client *client)
 {
 	u8 value;
 	u8 i;
@@ -108,7 +108,7 @@ static void print_all_reg_value(struct i2c_client *client)
 		max77693_read_reg(client, i, &value);
 		printk(KERN_ERR "LEDS_MAX77693 REG(%d) = %x\n", i, value);
 	}
-}
+} */
 
 static int max77693_led_get_en_value(struct max77693_led_data *led_data, int on)
 {

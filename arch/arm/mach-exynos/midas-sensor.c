@@ -365,7 +365,7 @@ static struct platform_device opt_gp2a = {
 };
 #endif
 
-static struct i2c_board_info i2c_devs9_emul[] __initdata = {
+static __maybe_unused struct i2c_board_info i2c_devs9_emul[] __initdata = {
 #if defined(CONFIG_SENSORS_GP2A)
 	{
 		I2C_BOARD_INFO("gp2a", (0x72 >> 1)),

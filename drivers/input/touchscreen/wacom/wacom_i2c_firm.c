@@ -136,7 +136,7 @@ void wacom_i2c_init_firm_data(void)
 		       "[E-PEN] Wacom driver is working for 4.4mm pitch pad.\n");
 #elif defined(CONFIG_MACH_T0)
 	int type;
-	int i;
+	//int i;
 
 	type = wacom_i2c_get_digitizer_type();
 
