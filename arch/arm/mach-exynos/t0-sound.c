@@ -274,7 +274,7 @@ static struct i2c_board_info i2c_devs19_emul[] __initdata = {
 static void t0_gpio_init(void)
 {
 	int err;
-	unsigned int gpio;
+	//unsigned int gpio;
 
 #ifdef CONFIG_SND_SOC_USE_EXTERNAL_MIC_BIAS
 	/* Main Microphone BIAS */

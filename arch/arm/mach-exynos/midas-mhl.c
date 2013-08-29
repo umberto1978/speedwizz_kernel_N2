@@ -92,8 +92,8 @@ static void sii9234_power_onoff(bool on)
 }
 
 #ifdef __MHL_NEW_CBUS_MSC_CMD__
-#if defined(CONFIG_MFD_MAX77693)
-static int sii9234_usb_op(bool on, int value)
+/*#if defined(CONFIG_MFD_MAX77693)
+static int sii9234_usb_op(bool on, int value) 
 {
 	pr_info("func:%s bool on(%d) int value(%d)\n", __func__, on, value);
 	if (on) {
@@ -132,7 +132,7 @@ static void sii9234_vbus_present(bool on, int value)
 	psy->set_property(psy, POWER_SUPPLY_PROP_ONLINE, &power_value);
 
 	return;
-}
+}*/
 #endif
 
 #ifdef CONFIG_SAMSUNG_MHL_UNPOWERED
