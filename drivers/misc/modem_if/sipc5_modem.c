@@ -168,8 +168,7 @@ static int attach_devices(struct io_device *iod, enum modem_link tx_link)
 {
 	struct modem_shared *msd = iod->msd;
 	struct link_device *ld;
-	unsigned ch;
-
+	
 	/* find link type for this io device */
 	list_for_each_entry(ld, &msd->link_dev_list, list) {
 		if (IS_CONNECTED(iod, ld)) {

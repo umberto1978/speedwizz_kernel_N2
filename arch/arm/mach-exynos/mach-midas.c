@@ -1137,7 +1137,7 @@ static struct i2c_board_info i2c_devs1[] __initdata = {
 
 #ifdef CONFIG_S3C_DEV_I2C4
 #ifdef CONFIG_MFD_MAX77693
-static struct i2c_board_info i2c_devs4_max77693[] __initdata = {
+static __maybe_unused struct i2c_board_info i2c_devs4_max77693[] __initdata = {
 	{
 		I2C_BOARD_INFO("max77693", (0xCC >> 1)),
 		.platform_data	= &exynos4_max77693_info,

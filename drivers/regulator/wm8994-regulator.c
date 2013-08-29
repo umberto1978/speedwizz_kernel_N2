@@ -95,8 +95,7 @@ static int wm8994_ldo1_list_voltage(struct regulator_dev *rdev,
 static int wm8994_ldo1_get_voltage_sel(struct regulator_dev *rdev)
 {
 	struct wm8994_ldo *ldo = rdev_get_drvdata(rdev);
-	int val;
-
+	
 	switch (ldo->wm8994->type) {
 	case WM8994:
 	case WM8958:
@@ -165,8 +164,7 @@ static int wm8994_ldo2_list_voltage(struct regulator_dev *rdev,
 static int wm8994_ldo2_get_voltage_sel(struct regulator_dev *rdev)
 {
 	struct wm8994_ldo *ldo = rdev_get_drvdata(rdev);
-	int val;
-
+	
 	switch (ldo->wm8994->type) {
 	case WM8994:
 		return 2;

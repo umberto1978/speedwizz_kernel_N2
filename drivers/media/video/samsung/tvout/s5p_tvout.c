@@ -283,7 +283,6 @@ static int __devinit s5p_tvout_probe(struct platform_device *pdev)
 {
 #if defined(CONFIG_S5P_MEM_CMA)
 	struct cma_info mem_info;
-	int ret;
 #elif defined(CONFIG_S5P_MEM_BOOTMEM)
 	int mdev_id;
 #endif

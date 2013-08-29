@@ -304,7 +304,7 @@ struct wacom_features {
 /*sec_class sysfs*/
 extern struct class *sec_class;
 
-static struct wacom_features wacom_feature_EMR = {
+static __maybe_unused struct wacom_features wacom_feature_EMR = {
 #if defined(CONFIG_MACH_P4NOTE) || defined(CONFIG_MACH_P4)
 	.x_max = 0x54C0,
 	.y_max = 0x34F8,
