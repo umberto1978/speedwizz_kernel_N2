@@ -18,12 +18,12 @@
 #include <linux/uaccess.h>
 #include <linux/highmem.h>
 #include <linux/dma-mapping.h>
+#include <linux/cma.h>
 #include <asm/cacheflush.h>
 
 #include <plat/cpu.h>
 
 #include <linux/exynos_mem.h>
-#include <mach/cma_check.h>
 
 #define L2_FLUSH_ALL	SZ_1M
 #define L1_FLUSH_ALL	SZ_64K
@@ -84,6 +84,12 @@ static void cache_maint_phys(phys_addr_t start, size_t length, enum cacheop op)
 	size_t left = length;
 	phys_addr_t begin = start;
 
+	if (!cma_is_registered_region(start, length)) {
+		pr_err("[%s] handling non-cma region (%#x@%#x)is prohibited\n",
+					__func__, length, start);
+		return;
+	}
+
 	if (!soc_is_exynos5250() && !soc_is_exynos5210()) {
 		if (length > (size_t) L1_FLUSH_ALL) {
 			flush_cache_all();
@@ -141,7 +147,6 @@ outer_cache_ops:
 	}
 }
 
-#if 0
 static void exynos_mem_paddr_cache_clean(dma_addr_t start, size_t length)
 {
 	if (length > (size_t) L2_FLUSH_ALL) {
@@ -161,7 +166,6 @@ static void exynos_mem_paddr_cache_clean(dma_addr_t start, size_t length)
 		outer_clean_range(start, end);	/* L2 */
 	}
 }
-#endif
 
 long exynos_mem_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
@@ -260,13 +264,9 @@ int exynos_mem_mmap(struct file *filp, struct vm_area_struct *vma)
 		pfn = mem->phybase;
 	}
 
-	if(check_memspace_against_cma_blocks(start, size) != 0)
-		return -EINVAL;
-
-	/* TODO: currently lowmem is only avaiable */
-	if ((phys_to_virt(start) < (void *)PAGE_OFFSET) ||
-	    (phys_to_virt(start) >= high_memory)) {
-		pr_err("[%s] invalid paddr(0x%08x)\n", __func__, start);
+	if (!cma_is_registered_region(start, size)) {
+		pr_err("[%s] handling non-cma region (%#x@%#x)is prohibited\n",
+						__func__, size, start);
 		return -EINVAL;
 	}
 
