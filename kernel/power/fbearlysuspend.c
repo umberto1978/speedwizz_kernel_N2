@@ -13,13 +13,15 @@
  *
  */
 
-#include <linux/delay.h> //Hack for CRT-off animation
+#include <linux/delay.h>
 #include <linux/earlysuspend.h>
 #include <linux/module.h>
 #include <linux/wait.h>
+#include <linux/err.h>
 
 #include "power.h"
 
+static int fb_delay = 100;
 static wait_queue_head_t fb_state_wq;
 static DEFINE_SPINLOCK(fb_state_lock);
 static enum {
@@ -34,7 +36,10 @@ static void stop_drawing_early_suspend(struct early_suspend *h)
 	int ret;
 	unsigned long irq_flags;
 
-	msleep(100); //Hack for CRT-off animation
+	/* FIXME: earlysuspend breaks androids CRT-off animation
+	* Sleep a little bit to get it played properly */
+	if(fb_delay)
+		msleep(fb_delay);
 
 	spin_lock_irqsave(&fb_state_lock, irq_flags);
 	fb_state = FB_STATE_REQUEST_STOP_DRAWING;
@@ -105,6 +110,36 @@ static ssize_t wait_for_fb_wake_show(struct kobject *kobj,
 	return s - buf;
 }
 
+static ssize_t fbdelay_show(struct kobject *kobj,
+			    struct kobj_attribute *attr, char *buf)
+{
+	return sprintf(buf, "%d", fb_delay);
+}
+
+static ssize_t fb_delay_show(struct kobject *kobj,
+			    struct kobj_attribute *attr, char *buf)
+{
+	return sprintf(buf, "%d", fb_delay);
+}
+
+static ssize_t fb_delay_store(struct kobject *kobj,
+			     struct kobj_attribute *attr,
+			     const char *buf, size_t n)
+{
+	int val;
+	if (sscanf(buf, "%d", &val) != 1)
+		return -EINVAL;
+
+	if(val > 1000)
+		val = 1000;
+	if(val < 0)
+		val = 0;
+
+	fb_delay = val;
+
+	return n;
+}
+
 #define power_ro_attr(_name) \
 static struct kobj_attribute _name##_attr = {	\
 	.attr	= {				\
@@ -117,10 +152,12 @@ static struct kobj_attribute _name##_attr = {	\
 
 power_ro_attr(wait_for_fb_sleep);
 power_ro_attr(wait_for_fb_wake);
+power_attr(fb_delay);
 
 static struct attribute *g[] = {
 	&wait_for_fb_sleep_attr.attr,
 	&wait_for_fb_wake_attr.attr,
+	&fb_delay_attr.attr,
 	NULL,
 };
 
@@ -153,4 +190,3 @@ static void  __exit android_power_exit(void)
 
 module_init(android_power_init);
 module_exit(android_power_exit);
-
