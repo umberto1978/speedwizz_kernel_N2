@@ -282,11 +282,11 @@ static CLASS_ATTR(dbg_msg, S_IRUGO | S_IWUSR,
 static int __devinit s5p_tvout_probe(struct platform_device *pdev)
 {
 #if defined(CONFIG_S5P_MEM_CMA)
-	struct cma_info mem_info;
+	struct cma_info;
 #elif defined(CONFIG_S5P_MEM_BOOTMEM)
 	int mdev_id;
 #endif
-	unsigned int vp_buff_vir_addr;
+	//unsigned int vp_buff_vir_addr;
 	unsigned int vp_buff_phy_addr = 0;
 	int i;
 
@@ -469,7 +469,7 @@ static int __devinit s5p_tvout_probe(struct platform_device *pdev)
 err_sysfs:
 	class_destroy(sec_tvout);
 err_class:
-err_ioremap:
+//err_ioremap:
 #if defined(CONFIG_S5P_MEM_CMA)
 	cma_free(vp_buff_phy_addr);
 #endif

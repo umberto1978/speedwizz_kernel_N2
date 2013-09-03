@@ -225,7 +225,7 @@ static int s5c73m3_i2c_write(struct v4l2_subdev *sd,
 	return err;
 }
 
-static int s5c73m3_i2c_write_block(struct v4l2_subdev *sd,
+/*static int s5c73m3_i2c_write_block(struct v4l2_subdev *sd,
 	const u32 regs[], int size)
 {
 	int i, err = 0;
@@ -236,7 +236,7 @@ static int s5c73m3_i2c_write_block(struct v4l2_subdev *sd,
 	}
 
 	return err;
-}
+}*/
 
 static int s5c73m3_i2c_read(struct v4l2_subdev *sd,
 	unsigned short addr, unsigned short *data)
@@ -773,7 +773,7 @@ static int s5c73m3_get_sensor_fw_version(struct v4l2_subdev *sd)
 	struct s5c73m3_state *state = to_state(sd);
 	u16 read_val;
 	u16 sensor_fw;
-	u16 sensor_type;
+	//u16 sensor_type;
 	u16 temp_buf;
 	int i;
 	int err = 0;
@@ -1115,19 +1115,19 @@ static int s5c73m3_update_camerafw_to_FROM(struct v4l2_subdev *sd)
 		return 0;
 }
 
-static int s5c73m3_SPI_booting_by_ISP(struct v4l2_subdev *sd)
+/*static int s5c73m3_SPI_booting_by_ISP(struct v4l2_subdev *sd)
 {
 	u16 read_val;
 	int i;
 	int err = 0;
 
-	/*ARM go*/
+	//ARM go
 	err = s5c73m3_write(sd, 0x3000, 0x0004, 0xFFFF);
 	CHECK_ERR(err);
 
 	udelay(400);
 
-	/*Check boot done*/
+	//Check boot done
 	for (i = 0; i < 3; i++) {
 		err = s5c73m3_read(sd, 0x3010, 0x0010, &read_val);
 		CHECK_ERR(err);
@@ -1143,13 +1143,13 @@ static int s5c73m3_SPI_booting_by_ISP(struct v4l2_subdev *sd)
 		return -1;
 	}
 
-	/* Change I/O Driver Current in order to read from F-ROM */
+	// Change I/O Driver Current in order to read from F-ROM 
 	err = s5c73m3_write(sd, 0x3010, 0x0120, 0x0820);
 	CHECK_ERR(err);
 	err = s5c73m3_write(sd, 0x3010, 0x0124, 0x0820);
 	CHECK_ERR(err);
 
-	/*P,M,S and Boot Mode*/
+	//P,M,S and Boot Mode
 	err = s5c73m3_write(sd, 0x3010, 0x0014, 0x2146);
 	CHECK_ERR(err);
 	err = s5c73m3_write(sd, 0x3010, 0x0010, 0x230C);
@@ -1157,7 +1157,7 @@ static int s5c73m3_SPI_booting_by_ISP(struct v4l2_subdev *sd)
 
 	udelay(200);
 
-	/*Check SPI ready*/
+	//Check SPI ready
 	for (i = 0; i < 300; i++) {
 		err = s5c73m3_read(sd, 0x3010, 0x0010, &read_val);
 		CHECK_ERR(err);
@@ -1173,20 +1173,20 @@ static int s5c73m3_SPI_booting_by_ISP(struct v4l2_subdev *sd)
 		return -1;
 	}
 
-	/*ARM reset*/
+	//ARM reset
 	err = s5c73m3_write(sd, 0x3000, 0x0004, 0xFFFD);
 	CHECK_ERR(err);
 
-	/*remap*/
+	//remap
 	err = s5c73m3_write(sd, 0x3010, 0x00A4, 0x0183);
 	CHECK_ERR(err);
 
-	/*ARM go*/
+	//ARM go
 	err = s5c73m3_write(sd, 0x3000, 0x0004, 0xFFFF);
 	CHECK_ERR(err);
 
 	return err;
-}
+}*/
 
 static int s5c73m3_check_fw_date(struct v4l2_subdev *sd)
 {
@@ -3152,20 +3152,20 @@ static int s5c73m3_init_param(struct v4l2_subdev *sd)
 	return 0;
 }
 
-static int s5c73m3_FROM_booting(struct v4l2_subdev *sd)
+/*static int s5c73m3_FROM_booting(struct v4l2_subdev *sd)
 {
 	u16 read_val;
 	int i, err;
 
 	cam_trace("E\n");
 
-	/*ARM go*/
+	//ARM go
 	err = s5c73m3_write(sd, 0x3000, 0x0004, 0xFFFF);
 	CHECK_ERR(err);
 
 	udelay(400);
 
-	/*Check boot done*/
+	//Check boot done
 	for (i = 0; i < 4; i++) {
 		err = s5c73m3_read(sd, 0x3010, 0x0010, &read_val);
 		CHECK_ERR(err);
@@ -3181,7 +3181,7 @@ static int s5c73m3_FROM_booting(struct v4l2_subdev *sd)
 		return -1;
 	}
 
-       /*P,M,S and Boot Mode*/
+       //P,M,S and Boot Mode
 	err = s5c73m3_write(sd, 0x3100, 0x010C, 0x0044);
 	CHECK_ERR(err);
 	err = s5c73m3_write(sd, 0x3100, 0x0108, 0x000D);
@@ -3201,7 +3201,7 @@ static int s5c73m3_FROM_booting(struct v4l2_subdev *sd)
 
 	mdelay(300);
 
-	/*Check binary read done*/
+	//Check binary read done
 	for (i = 0; i < 3; i++) {
 		err = s5c73m3_read(sd, 0x3010, 0x0010, &read_val);
 		CHECK_ERR(err);
@@ -3217,22 +3217,22 @@ static int s5c73m3_FROM_booting(struct v4l2_subdev *sd)
 		return -1;
 	}
 
-	/*ARM reset*/
+	//ARM reset
 	err = s5c73m3_write(sd, 0x3000, 0x0004, 0xFFFD);
 	CHECK_ERR(err);
 
-	/*remap*/
+	//remap
 	err = s5c73m3_write(sd, 0x3010, 0x00A4, 0x0183);
 	CHECK_ERR(err);
 
-	/*ARM go again*/
+	//ARM go again
 	err = s5c73m3_write(sd, 0x3000, 0x0004, 0xFFFF);
 	CHECK_ERR(err);
 
 	cam_trace("X\n");
 
 	return 0;
-}
+}*/
 
 static int s5c73m3_SPI_booting(struct v4l2_subdev *sd)
 {
