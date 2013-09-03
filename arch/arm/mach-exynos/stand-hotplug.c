@@ -66,12 +66,12 @@
 
 #if defined(CONFIG_MACH_MIDAS) || defined(CONFIG_MACH_SMDK4X12) \
 	|| defined(CONFIG_MACH_SLP_PQ)
-#define TRANS_LOAD_H0 20
-#define TRANS_LOAD_L1 10
-#define TRANS_LOAD_H1 35
-#define TRANS_LOAD_L2 15
-#define TRANS_LOAD_H2 45
-#define TRANS_LOAD_L3 20
+#define TRANS_LOAD_H0 10
+#define TRANS_LOAD_L1 5
+#define TRANS_LOAD_H1 15
+#define TRANS_LOAD_L2 7
+#define TRANS_LOAD_H2 20
+#define TRANS_LOAD_L3 10
 
 #define BOOT_DELAY	60
 
