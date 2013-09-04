@@ -670,7 +670,7 @@ static void link_pm_runtime_start(struct work_struct *work)
 	}
 }
 
-static void link_pm_force_cp_dump(struct link_pm_data *pm_data)
+static __maybe_unused void link_pm_force_cp_dump(struct link_pm_data *pm_data)
 {
 	struct modem_ctl *mc = if_usb_get_modemctl(pm_data);
 

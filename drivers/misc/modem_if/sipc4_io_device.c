@@ -819,7 +819,7 @@ exit:
 	return err;
 }
 
-static int rx_rfs_packet(struct io_device *iod, struct link_device *ld,
+static __maybe_unused int rx_rfs_packet(struct io_device *iod, struct link_device *ld,
 					const char *data, unsigned size)
 {
 	int err = 0;
