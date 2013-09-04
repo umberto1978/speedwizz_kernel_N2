@@ -1571,7 +1571,7 @@ static int s3c_fb_set_win_buffer(struct s3cfb_global *fbdev,
 	struct fb_fix_screeninfo prev_fix = fb->fix;
 	struct fb_var_screeninfo prev_var = fb->var;
 	unsigned short win_no = win->id;
-	int ret;
+	//int ret;
 	size_t window_size;
 	u32 alpha, size;
 

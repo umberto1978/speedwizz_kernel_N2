@@ -505,14 +505,14 @@ static int init_elvss_table(struct lcd_info *lcd)
 
 	return 0;
 
-err_alloc_elvss:
+/*err_alloc_elvss:
 	while (i > 0) {
 		kfree(lcd->elvss_table[i-1]);
 		i--;
-	}
+	}*/
 	kfree(lcd->elvss_table);
-err_alloc_elvss_table:
-	return ret;
+/*err_alloc_elvss_table:
+	return ret;*/
 }
 
 #ifdef SMART_DIMMING

@@ -672,7 +672,7 @@ static ssize_t negative_show(struct device *dev,
 {
 	struct mdnie_info *mdnie = dev_get_drvdata(dev);
 	char *pos = buf;
-	u32 i;
+	u32;
 
 	pos += sprintf(pos, "%d\n", mdnie->negative);
 

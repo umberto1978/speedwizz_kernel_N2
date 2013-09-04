@@ -77,7 +77,7 @@ static const unsigned char gamma_id_list[GAMMA_300CD_MAX] = {
 	0x80, 0x81, 0x82, 0xA2
 };
 
-static s16 s9_to_s16(s16 v)
+static __maybe_unused s16 s9_to_s16(s16 v)
 {
 	return (s16)(v << 7) >> 7;
 }
