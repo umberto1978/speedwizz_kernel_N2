@@ -654,11 +654,11 @@ static int __devinit Si47xx_i2c_probe(struct i2c_client *client,
 
 	return ret;
 
-MISC_IRQ_DREG:
+/*MISC_IRQ_DREG:
 	free_irq(client->irq, NULL);
 	mutex_destroy(&Si47xx_dev->lock);
 	kfree(Si47xx_dev);
-	return ret;
+	return ret;*/
 
 }
 

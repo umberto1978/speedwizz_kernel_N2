@@ -36,7 +36,7 @@ static struct usb_device_id audio_dock_table[] = {
 { }	/* Terminating entry */
 };
 
-static void call_audiodock_notify(struct usb_device *dev)
+static __maybe_unused void call_audiodock_notify(struct usb_device *dev)
 {
 	struct usb_device_id	*id = audio_dock_table;
 	/* check VID, PID */

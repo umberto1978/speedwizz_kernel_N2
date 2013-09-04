@@ -718,7 +718,7 @@ static ssize_t mtpg_write(struct file *fp, const char __user *buf,
 	return r;
 }
 
-static void interrupt_complete(struct usb_ep *ep, struct usb_request *req)
+static __maybe_unused void interrupt_complete(struct usb_ep *ep, struct usb_request *req)
 {
 	printk(KERN_DEBUG "Finished Writing Interrupt Data\n");
 }
