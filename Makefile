@@ -659,6 +659,12 @@ endif
 
 include ${srctree}/scripts/Makefile.lto
 
+# check user boot splash
+ifeq ($(USER_BOOT_SPLASH),y)
+  KBUILD_CFLAGS  += -DUSER_BOOT_SPLASH
+endif
+
+
 # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
 # But warn user when we do so
 warn-assign = \

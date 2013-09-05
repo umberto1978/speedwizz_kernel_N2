@@ -45,6 +45,10 @@
 #define CMA_REGION_VIDEO	"fimd"
 #endif
 
+#ifdef USER_BOOT_SPLASH
+#include "logo_rgb24_user.h"
+#endif
+
 #ifdef CONFIG_BUSFREQ_OPP
 #include <mach/dev.h>
 #endif
@@ -119,6 +123,12 @@ int s3cfb_draw_logo(struct fb_info *fb)
 		memcpy(fb->screen_base, logo_virt_buf, fb->var.yres * fb->fix.line_length);
 		printk(KERN_INFO "Bootloader sent 'bootloaderfb' : %08X\n", bootloaderfb);
 	}
+
+#ifdef USER_BOOT_SPLASH
+	memcpy(fb->screen_base, LOGO_RGB24, fb->var.yres * fb->fix.line_length);
+#else
+	memcpy(fb->screen_base, logo_virt_buf, fb->var.yres * fb->fix.line_length);
+#endif
 
 #endif /* #ifdef RGB_BOOTSCREEN */
 #endif
