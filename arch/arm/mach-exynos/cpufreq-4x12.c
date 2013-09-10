@@ -874,17 +874,17 @@ ssize_t store_UV_uV_table(struct cpufreq_policy *policy,
 
 	unsigned int ret = -EINVAL;
 	int i = 0;
-	int t[14];
+	int t[15];
 
-	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-		     &t[0],&t[1],&t[2],&t[3],&t[4],&t[5],&t[6],&t[7],&t[8],&t[9],&t[10],&t[11],&t[12],&t[13]);
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+		     &t[0],&t[1],&t[2],&t[3],&t[4],&t[5],&t[6],&t[7],&t[8],&t[9],&t[10],&t[11],&t[12],&t[13],&t[14]);
 
-	if(ret != 14) {
+	if(ret != 15) {
 		return -EINVAL;
 	} else {
 		int invalid_offset = 0;
 
-		for (i = 0; i < 14; i++) {
+		for (i = 0; i < 15; i++) {
 			if (t[i] > CPU_UV_MV_MAX) 
 				t[i] = CPU_UV_MV_MAX;
 			else if (t[i] < CPU_UV_MV_MIN) 
@@ -904,17 +904,17 @@ ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
 
 	unsigned int ret = -EINVAL;
 	int i = 0;
-	int t[14];
+	int t[15];
 
-	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-		     &t[0],&t[1],&t[2],&t[3],&t[4],&t[5],&t[6],&t[7],&t[8],&t[9],&t[10],&t[11],&t[12],&t[13]);
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+		     &t[0],&t[1],&t[2],&t[3],&t[4],&t[5],&t[6],&t[7],&t[8],&t[9],&t[10],&t[11],&t[12],&t[13],&t[14]);
 
-	if(ret != 14) {
+	if(ret != 15) {
 		return -EINVAL;
 	} else {
 		int invalid_offset = 0;
 
-		for (i = 0; i < 14; i++) {
+		for (i = 0; i < 15; i++) {
 			int rest = 0;
 
 			t[i] *= 1000;
