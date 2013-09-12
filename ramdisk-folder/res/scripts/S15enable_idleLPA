@@ -1,0 +1,6 @@
+#!/system/bin/sh
+#This option enable IDLE+LPA mode (RECCOMENDED)
+#WARNING: enable one option only!!
+#Default 800
+
+echo "2" > /sys/module/cpuidle_exynos4/parameters/enable_mask

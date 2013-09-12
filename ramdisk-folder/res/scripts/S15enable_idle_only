@@ -1,0 +1,6 @@
+#!/system/bin/sh
+#This option enable IDLE mode only
+#WARNING: enable one option only!!
+#Default 800
+
+echo "0" > /sys/module/cpuidle_exynos4/parameters/enable_mask

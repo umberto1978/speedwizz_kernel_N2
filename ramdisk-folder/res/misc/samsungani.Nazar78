@@ -1,0 +1,86 @@
+#!/system/bin/sh
+
+header()
+{
+echo
+echo .:[altSamsungAni v1.1 - by Nazar78]:.
+echo
+}
+
+default()
+{
+if [ -e "/system/bin/samsungani.Nazar78" ]
+then
+	if [ ! -x "/system/bin/samsungani.Nazar78" ]
+	then
+		toolbox chmod 0755 /system/bin/samsungani.Nazar78
+	fi
+	/system/bin/samsungani.Nazar78
+elif [ -e "/data/local/bootanimation.bin.Nazar78" ]
+then
+	if [ ! -x "/data/local/bootanimation.bin.Nazar78" ]
+	then
+		toolbox chmod 0755 /data/local/bootanimation.bin.Nazar78
+	fi
+	/data/local/bootanimation.bin.Nazar78
+fi
+}
+
+BUSYBOX=$(busybox which busybox)
+if [[ ! -e $BUSYBOX ]] || [[ ! -x $BUSYBOX ]]
+then
+	header
+	echo "ERROR:0 busybox not installed!"
+	echo
+	default
+	exit 1
+fi
+
+ANI=$($BUSYBOX which bootanimation)
+if [[ ! -e $ANI ]] || [[ ! -x $ANI ]]
+then
+	header
+	echo "ERROR:0 bootanimation missing!"
+	echo
+	default
+	exit 1
+fi
+
+if [[ ! -e "/system/media/bootanimation.zip" ]] && [[ ! -e "/data/local/bootanimation.zip" ]]
+then
+	header
+	echo "WARNING! bootanimation.zip missing! Place 'bootanimation.zip' in either '/system/media' or '/data/local'. Now using default animation"
+	echo
+	default
+	exit 1
+fi
+
+if [ "$1" != "monitor" ]
+then
+	DIR=$($BUSYBOX dirname $0)
+	FILE=$($BUSYBOX basename $0)
+	($ANI) &
+	if [ -x "$DIR/$FILE" ]
+	then
+		("$DIR/$FILE" monitor) &
+	else
+		(sh "$DIR/$FILE" monitor) &
+	fi
+	exit 0
+fi
+
+header
+
+while [[ `getprop sys.boot_completed` != 1 ]]
+do
+	$BUSYBOX sleep 1
+done
+
+PID=$($BUSYBOX pidof $($BUSYBOX basename $ANI))
+
+if [[ $PID != "" ]]
+then
+	$BUSYBOX kill $PID
+fi
+
+exit 0

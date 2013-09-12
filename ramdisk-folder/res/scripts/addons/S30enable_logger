@@ -1,0 +1,5 @@
+#!/system/bin/sh
+#Enable-Disable Logger (reboot needed)
+#Enabling this option will load logger module, removing setting will prevent logger to work
+
+insmod /lib/modules/logger.ko

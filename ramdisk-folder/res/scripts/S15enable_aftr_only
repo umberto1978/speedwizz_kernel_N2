@@ -1,0 +1,6 @@
+#!/system/bin/sh
+#This option enable AFTR mode only
+#WARNING: enable one option only!!
+#Default 800
+
+echo "1" > /sys/module/cpuidle_exynos4/parameters/enable_mask

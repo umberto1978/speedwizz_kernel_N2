@@ -1,0 +1,6 @@
+#!/system/bin/sh
+#Global Average Undervolt -27mV
+#WARNING: enable one option only!!
+#Default 800
+
+echo "1285 1285 1225 1175 1160 1100 1075 1050 1035 1010 985 950 960 925 935 " > /sys/devices/system/cpu/cpu0/cpufreq/UV_mV_table
