@@ -10,11 +10,6 @@ echo $(date) START of post-init.sh
 # Remount rootfs rw
   /sbin/busybox mount rootfs -o remount,rw
 
-# Android Logger enable tweak
-#if [ -f /system/.logcat ] || [ -f /data/.logcat ]; then
-#  insmod /lib/modules/logger.ko
-#fi
-
 # IPv6 privacy tweak
 #if /sbin/busybox [ "`/sbin/busybox grep IPV6PRIVACY /system/etc/tweaks.conf`" ]; then
   echo "2" > /proc/sys/net/ipv6/conf/all/use_tempaddr
@@ -34,20 +29,12 @@ echo $(date) START of post-init.sh
         /sbin/busybox mount -o remount,commit=15 $k
   done
 
-#enable kmem interface for everyone
-# echo 0 > /proc/sys/kernel/kptr_restrict
+# Speedwizz Tweaks
+/sbin/busybox sh /sbin/speedwizz_tweaks.sh
 
 #disable cpuidle log
 echo 0 > /sys/module/cpuidle_exynos4/parameters/log_en
   
-# Selecting sched_mc_power_savings balance based on user choice - default 0 for higher performance
-# if [ -f /system/.battery ] || [ -f /data/.battery ]; then
-#  echo 2 > /sys/devices/system/cpu/sched_mc_power_savings
-# else
-#  echo 0 > /sys/devices/system/cpu/sched_mc_power_savings
-# fi
-
-
 # pegasusq tweaks
 echo 20000 > /sys/devices/system/cpu/cpufreq/pegasusq/sampling_rate
 echo 20 > /sys/devices/system/cpu/cpufreq/pegasusq/cpu_up_rate
@@ -67,13 +54,6 @@ echo 400 > /sys/devices/system/cpu/cpufreq/pegasusq/hotplug_rq_4_0
 echo 2 > /sys/devices/system/cpu/cpufreq/pegasusq/sampling_down_factor
 echo 37 > /sys/devices/system/cpu/cpufreq/pegasusq/freq_step
 
-# Disabling gentle fair sleepers on user request
-#if [ -f /system/.gfs ] || [ -f /data/.gfs ]; then
-#  echo "GENTLE_FAIR_SLEEPERS" > /sys/kernel/debug/sched_features
-#else
-#  echo "NO_GENTLE_FAIR_SLEEPERS" > /sys/kernel/debug/sched_features
-#fi
-
 # Turn off debugging for certain modules
   echo "0" > /sys/module/wakelock/parameters/debug_mask
   echo "0" > /sys/module/userwakelock/parameters/debug_mask
@@ -86,17 +66,8 @@ echo 37 > /sys/devices/system/cpu/cpufreq/pegasusq/freq_step
   echo "0" > /sys/module/mali/parameters/mali_debug_level
   echo "0" > /sys/module/ump/parameters/ump_debug_level
 
-# Install andromizer 
-#if [ -f /system/app/*j.y.daddy.customizer* ] || [ -f /data/app/*j.y.daddy.customizer* ];
-#then
-#	echo "andromizer already exists"
-#else
-#	echo "Copying andromizer"
-#	/sbin/busybox mount /system -o remount,rw
-#	/sbin/busybox cp /res/misc/com.j.y.daddy.customizer-1.apk /system/app/com.j.y.daddy.customizer-1.apk
-#	/sbin/busybox chown 0.0 /system/app/com.j.y.daddy.customizer-1.apk
-#	/sbin/busybox chmod 644 /system/app/com.j.y.daddy.customizer-1.apk
-#fi
+/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /cache /cache;
+/sbin/busybox mount -o noatime,remount,rw,discard,barrier=0,commit=60,noauto_da_alloc,delalloc /data /data;
 
 # Install Boeffla Sound
 if [ -f /system/app/*near.boefflasound* ] || [ -f /data/app/*near.boefflasound* ];
@@ -122,7 +93,7 @@ else
 	/sbin/busybox chmod 644 /system/app/SpeedWizz_Manager.apk
 fi
 
-##### Install SU #####
+##### Root section #####
 
 # Check for old version of Superuser.apk and delete if found
 SUPERUSER_SIZE=`/sbin/busybox stat -t /system/app/Superuser.apk | /sbin/busybox cut -d " " -f2`
@@ -173,10 +144,6 @@ chmod 400 /data/log/dumpstate_app_anr.txt.gz.tmp
 chmod 400 /data/log/dumpstate_app_error.txt.gz
 
 # End of dumpstate cleanup
-
-/sbin/busybox sh /sbin/thunderbolt.sh
-
-
 
 echo $(date) PRE-INIT DONE of post-init.sh
 ##### Post-init phase #####
