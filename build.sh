@@ -116,9 +116,10 @@ rm -f *.img
 find . -name "*.zip" -exec mv {} /home/umberto1978/android/released/ \;
 cd /home/umberto1978/android/boot-images
 mv newBoot.img /home/umberto1978/android/build/boot.img
-echo "now compiling zip flashable"
+echo "now compiling zip and Tar flashables"
 cd /home/umberto1978/android/build
 zip -r speedwizz_kernel_N2_`date +"%Y-%m-%d-%H-%M-%S"` ./
+tar -H ustar -c boot.img > speedwizz_kernel_N2_`date +"%Y-%m-%d-%H-%M-%S"`.tar
 echo "DONE!"
 sleep 3
 exit

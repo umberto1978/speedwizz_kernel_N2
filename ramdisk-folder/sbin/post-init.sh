@@ -93,24 +93,16 @@ else
 	/sbin/busybox chmod 644 /system/app/SpeedWizz_Manager.apk
 fi
 
+/system/bin/setprop pm.sleep_mode 1
+/system/bin/setprop ro.ril.disable.power.collapse 0
+/system/bin/setprop ro.telephony.call_ring.delay 1000
+
 ##### Root section #####
-
-# Check for old version of Superuser.apk and delete if found
-SUPERUSER_SIZE=`/sbin/busybox stat -t /system/app/Superuser.apk | /sbin/busybox cut -d " " -f2`
-if [ "$SUPERUSER_SIZE" -eq 1468798 ];
-then
-	echo "Deleting old Superuser.apk and su"
-	/sbin/busybox mount /system -o remount,rw
-	/sbin/busybox rm /system/app/Superuser.apk
-	/sbin/busybox rm /system/xbin/su
-	/sbin/busybox mount /system -o remount,ro
-fi
-
-# Install su and Superuser.apk 
-if [ -f /system/app/Superuser.apk ];
-then
+if [ ! -e /storage/sdcard0/noroot ]; then
+        
+        if [ -f /system/app/Superuser.apk ]; then
 	echo "Superuser.apk already exists"
-else
+        else
 	echo "Copying Superuser.apk"
 	/sbin/busybox mount /system -o remount,rw
 	/sbin/busybox rm /system/app/Superuser.apk
@@ -126,6 +118,23 @@ else
 	/sbin/busybox chown 0.0 /system/xbin/su
 	/sbin/busybox chmod 6755 /system/xbin/su
 	/sbin/busybox mount /system -o remount,ro
+        fi
+else
+        /sbin/busybox mount /system -o remount,rw
+	/sbin/busybox rm /system/app/Superuser.apk
+	/sbin/busybox rm /data/app/Superuser.apk
+	/sbin/busybox rm /system/bin/su
+	/sbin/busybox rm /system/xbin/su
+        /sbin/busybox mount /system -o remount,ro
+fi
+
+if [ ! -f /system/xbin/busybox ]; then
+/sbin/busybox mount /system -o remount,rw
+cp /sbin/busybox /system/xbin/busybox
+chown 0.0 /system/xbin/busybox
+chmod 0755 /system/xbin/busybox
+ln -s /sbin/busybox /system/xbin/pkill
+/sbin/busybox mount /system -o remount,ro
 fi
 # End of auto-root section
 
