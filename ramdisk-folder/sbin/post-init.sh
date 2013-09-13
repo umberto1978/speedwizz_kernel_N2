@@ -121,8 +121,14 @@ if [ ! -e /storage/sdcard0/noroot ]; then
         fi
 else
         /sbin/busybox mount /system -o remount,rw
-	/sbin/busybox rm /system/app/Superuser.apk
-	/sbin/busybox rm /data/app/Superuser.apk
+	/sbin/busybox rm -f /system/app/*uper?ser.apk 
+	/sbin/busybox rm -f /system/app/?uper?u.apk 
+	/sbin/busybox rm -f /system/app/*chainfire?supersu*.apk 
+	/sbin/busybox rm -f /data/app/*uper?ser.apk 
+	/sbin/busybox rm -f /data/app/?uper?u.apk
+	/sbin/busybox rm -f /data/app/*chainfire?supersu*.apk 
+	/sbin/busybox rm -rf /data/dalvik-cache/*uper?ser.apk* 
+	/sbin/busybox rm -rf /data/dalvik-cache/*chainfire?supersu*.apk*	
 	/sbin/busybox rm /system/bin/su
 	/sbin/busybox rm /system/xbin/su
         /sbin/busybox mount /system -o remount,ro
