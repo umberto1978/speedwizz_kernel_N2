@@ -1,6 +1,0 @@
-#!/system/bin/sh
-#This option disable Gentle_fair_sleepers 
-#WARNING: enable one option only!!
-#Default 800
-
-echo "NO_GENTLE_FAIR_SLEEPERS" > /sys/kernel/debug/sched_features

@@ -1,9 +1,0 @@
-#!/system/bin/sh
-#Enable CFQ scheduler 
-#WARNING: enable one option only!!
-#Default 800
-
-for i in `ls /sys/block/stl*` /sys/block/bml* /sys/block/mmcblk* /sys/block/mtdblock* ; do
-        echo "cfq" > $i/queue/scheduler;
-        echo "$i/queue/scheduler";
-done;

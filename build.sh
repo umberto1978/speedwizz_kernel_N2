@@ -68,12 +68,12 @@ echo "done"
 sleep 3
 
 echo "now build ramdisk"
-cd /home/umberto1978/android/speedwizz_kernel_N2/ramdisk-folder
+cd /home/umberto1978/android/ramdisk-folder
 rm *~
 sleep 3
 
 echo "erasing old modules and zImage"
-cd /home/umberto1978/android/speedwizz_kernel_N2/ramdisk-folder/lib/modules
+cd /home/umberto1978/android/ramdisk-folder/lib/modules
 rm -f btlock*
 rm -f commkm*
 rm -f logger*
@@ -88,7 +88,7 @@ sleep 3
 
 echo "copy new modules and zImage"
 cd /home/umberto1978/android/compiled/modules
-find . -name "*.ko" -exec cp {} /home/umberto1978/android/speedwizz_kernel_N2/ramdisk-folder/lib/modules/ \;
+find . -name "*.ko" -exec cp {} /home/umberto1978/android/ramdisk-folder/lib/modules/ \;
 cd /home/umberto1978/android/compiled
 cp zImage /home/umberto1978/android/boot-images/new_zImage
 echo "Done"
@@ -97,7 +97,7 @@ sleep 3
 echo "now pack ramdisk"
 cd /home/umberto1978/android/boot-images
 rm *.img
-cd /home/umberto1978/android/speedwizz_kernel_N2/ramdisk-folder
+cd /home/umberto1978/android/ramdisk-folder
 find . | cpio -o -H newc | gzip > /home/umberto1978/android/boot-images/ramdisk.cpio.gz
 cd /home/umberto1978/android/boot-images
 mv ramdisk.cpio.gz initrd.img

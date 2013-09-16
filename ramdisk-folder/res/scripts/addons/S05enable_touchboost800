@@ -1,7 +1,0 @@
-#!/system/bin/sh
-#Touchboost frequency 800mhz
-#WARNING: enable one option only!!
-#Default 800
-
-echo "1 - Touchboost enabled" > /sys/devices/virtual/misc/touchboost_switch/touchboost_switch
-echo "800000" > /sys/devices/virtual/misc/touchboost_switch/touchboost_freq
