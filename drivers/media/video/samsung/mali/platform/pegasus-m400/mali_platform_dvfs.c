@@ -77,7 +77,7 @@ mali_dvfs_step step[MALI_DVFS_STEPS]={
 #if (MALI_DVFS_STEPS > 3)
 	/*step 3 clk*/ {533,  1025000},
 #if (MALI_DVFS_STEPS > 4)
-	/*step 4 clk*/ {733,  1125000}
+	/*step 4 clk*/ {733,  1150000}
 #endif
 #endif
 #endif
@@ -126,7 +126,7 @@ int step2_up = 75;
 int step3_down = 70; //85;
 #if (MALI_DVFS_STEPS > 4)
 int step4_clk = 733;
-int step4_vol = 1125000;
+int step4_vol = 1150000;
 int step3_up = 80;
 int step4_down = 75; //95;
 #endif
@@ -139,7 +139,7 @@ mali_dvfs_table mali_dvfs_all[MAX_MALI_DVFS_STEPS]={
 	{350   ,1000000   ,  900000},
 	{440   ,1000000   , 975000},
 	{533   ,1000000   , 1025000},
-	{733   ,1000000   , 1125000} };
+	{733   ,1000000   , 1150000} };
 mali_dvfs_table mali_dvfs[MALI_DVFS_STEPS]={
 	{160   ,1000000   , 825000},
 #if (MALI_DVFS_STEPS > 1)
@@ -149,7 +149,7 @@ mali_dvfs_table mali_dvfs[MALI_DVFS_STEPS]={
 #if (MALI_DVFS_STEPS > 3)
 	{533   ,1000000   ,1025000},
 #if (MALI_DVFS_STEPS > 4)
-	{733   ,1000000   ,1125000}
+	{733   ,1000000   ,1150000}
 #endif
 #endif
 #endif
@@ -211,7 +211,7 @@ static unsigned int asv_3d_volt_9_table_for_prime[MALI_DVFS_STEPS][ASV_LEVEL_PRI
 #if (MALI_DVFS_STEPS > 3)
 	{ 1112500, 1087500, 1075000, 1062500, 1050000, 1037500, 1025000, 1012500, 1025000, 1012500, 987500, 975000, 962500},	/* L1(533Mhz) */
 #if (MALI_DVFS_STEPS > 4)
-	{ 1212500, 1187500, 1175000, 1162500, 1150000, 1137500, 1125000, 1112500, 1125000, 1112500, 1087500, 1075000, 1062500},	/* L0(733Mhz) */
+	{ 1237500, 1212500, 1200000, 1187500, 1175000, 1162500, 1150000, 1137500, 1150000, 1137500, 1112500, 1100000, 1087500},	/* L0(733Mhz) */
 #endif
 #endif
 #endif
@@ -367,7 +367,7 @@ static void mali_platform_wating(u32 msec)
 	while(1) {
 		read_val = _mali_osk_mem_ioread32(clk_register_map, 0x00);
 		if ((read_val & 0x8000)==0x0000) break;
-			_mali_osk_time_ubusydelay(5000); //SpeedMod: 100 -> 5000 = 5ms // 1000 -> 100 : 20101218
+			_mali_osk_time_ubusydelay(100); // 1000 -> 100 : 20101218
 		}
 		/* _mali_osk_time_ubusydelay(msec*1000);*/
 }
