@@ -1,6 +1,6 @@
 #
 # Automatically generated make config: don't edit
-# Linux/arm 3.0.45 Kernel Configuration
+# Linux/arm 3.0.60 Kernel Configuration
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -630,6 +630,7 @@ CONFIG_PL330=y
 # CONFIG_PCI_SYSCALL is not set
 # CONFIG_ARCH_SUPPORTS_MSI is not set
 # CONFIG_PCCARD is not set
+# CONFIG_ARM_ERRATA_775420 is not set
 
 #
 # Kernel Features
@@ -687,6 +688,7 @@ CONFIG_CMA_BEST_FIT=y
 # CONFIG_LOWMEM_CHECK is not set
 CONFIG_FORCE_MAX_ZONEORDER=12
 CONFIG_ALIGNMENT_TRAP=y
+CONFIG_ALLOW_CPU_ALIGNMENT=y
 # CONFIG_UACCESS_WITH_MEMCPY is not set
 # CONFIG_SECCOMP is not set
 # CONFIG_CC_STACKPROTECTOR is not set
@@ -2506,7 +2508,6 @@ CONFIG_USB_STORAGE=y
 # CONFIG_USB_STORAGE_KARMA is not set
 # CONFIG_USB_STORAGE_CYPRESS_ATACB is not set
 # CONFIG_USB_STORAGE_ENE_UB6250 is not set
-# CONFIG_USB_UAS is not set
 # CONFIG_USB_LIBUSUAL is not set
 
 #
