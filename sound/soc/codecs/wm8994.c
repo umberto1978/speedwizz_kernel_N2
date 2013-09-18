@@ -2316,7 +2316,7 @@ out:
 	return 0;
 }
 
-static irqreturn_t wm8994_fll_locked_irq(int irq, void *data)
+static __maybe_unused irqreturn_t wm8994_fll_locked_irq(int irq, void *data)
 {
 	struct completion *completion = data;
 
@@ -3756,7 +3756,7 @@ out:
 	return IRQ_HANDLED;
 }
 
-static irqreturn_t wm8994_fifo_error(int irq, void *data)
+static __maybe_unused irqreturn_t wm8994_fifo_error(int irq, void *data)
 {
 	struct snd_soc_codec *codec = data;
 
@@ -3765,7 +3765,7 @@ static irqreturn_t wm8994_fifo_error(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-static irqreturn_t wm8994_temp_warn(int irq, void *data)
+static __maybe_unused irqreturn_t wm8994_temp_warn(int irq, void *data)
 {
 	struct snd_soc_codec *codec = data;
 
@@ -3774,7 +3774,7 @@ static irqreturn_t wm8994_temp_warn(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-static irqreturn_t wm8994_temp_shut(int irq, void *data)
+static __maybe_unused irqreturn_t wm8994_temp_shut(int irq, void *data)
 {
 	struct snd_soc_codec *codec = data;
 
