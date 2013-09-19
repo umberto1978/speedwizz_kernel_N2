@@ -21,7 +21,7 @@ echo "Done"
 sleep 3
 
 echo "Perform a working config"
-make speedwizz_test_defconfig
+make speedwizz_test_aosp_defconfig
 echo "Done"
 sleep 3
 
