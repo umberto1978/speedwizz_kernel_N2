@@ -13,7 +13,6 @@
  *
  */
 
-#include <linux/delay.h> //Hack for CRT-off animation
 #include <linux/earlysuspend.h>
 #include <linux/module.h>
 #include <linux/wait.h>
@@ -33,8 +32,6 @@ static void stop_drawing_early_suspend(struct early_suspend *h)
 {
 	int ret;
 	unsigned long irq_flags;
-
-	msleep(200); //Hack for CRT-off animation
 
 	spin_lock_irqsave(&fb_state_lock, irq_flags);
 	fb_state = FB_STATE_REQUEST_STOP_DRAWING;
