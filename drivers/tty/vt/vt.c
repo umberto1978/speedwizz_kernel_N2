@@ -3626,11 +3626,11 @@ int unregister_con_driver(const struct consw *csw)
 			con_driver->last = 0;
 			retval = 0;
 			break;
-		}
-	}
-err:
-	console_unlock();
-	return retval;
+     }
+   }
+ err:
+   console_unlock();
+   return retval;
 }
 EXPORT_SYMBOL(unregister_con_driver);
 
