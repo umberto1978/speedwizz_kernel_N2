@@ -283,7 +283,7 @@ static void notify_update(struct vc_data *vc)
 static inline unsigned short *screenpos(struct vc_data *vc, int offset, int viewed)
 {
 	unsigned short *p;
-	
+
 	if (!viewed)
 		p = (unsigned short *)(vc->vc_origin + offset);
 	else if (!vc->vc_sw->con_screen_pos)
@@ -3626,11 +3626,11 @@ int unregister_con_driver(const struct consw *csw)
 			con_driver->last = 0;
 			retval = 0;
 			break;
-     }
-   }
- err:
-   console_unlock();
-   return retval;
+		}
+	}
+err:
+	console_unlock();
+	return retval;
 }
 EXPORT_SYMBOL(unregister_con_driver);
 
@@ -3648,7 +3648,7 @@ int take_over_console(const struct consw *csw, int first, int last, int deflt)
 	err = register_con_driver(csw, first, last);
 	/* if we get an busy error we still want to bind the console driver
 	 * and return success, as we may have unbound the console driver
-	 * but not unregistered it.
+	 * but not unregistered it.
 	*/
 	if (err == -EBUSY)
 		err = 0;
@@ -4045,7 +4045,7 @@ static int con_font_set(struct vc_data *vc, struct console_font_op *op)
 		int h, i;
 		u8 __user *charmap = op->data;
 		u8 tmp;
-		
+
 		/* If from KDFONTOP ioctl, don't allow things which can be done in userland,
 		   so that we can get rid of this soon */
 		if (!(op->flags & KD_FONT_FLAG_OLD))
