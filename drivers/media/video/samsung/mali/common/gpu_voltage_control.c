@@ -8,6 +8,7 @@
  *  Modified for SiyahKernel
  *
  *  Modified by Andrei F. for Galaxy S3 / Perseus kernel (June 2012)
+ *  Modified by Simone R. for Note 2 / NEAK Kernel with refactorings (Oct 2012)
  *
  *  This program is free software; you can redistribute  it and/or modify it
  *  under  the terms of the GNU General Public License as published by the
@@ -20,9 +21,6 @@
 
 #include "gpu_voltage_control.h"
 
-#define MIN_VOLTAGE_GPU  800000
-#define MAX_VOLTAGE_GPU 1200000
-
 typedef struct mali_dvfs_tableTag{
     unsigned int clock;
     unsigned int freq;
@@ -32,34 +30,40 @@ typedef struct mali_dvfs_thresholdTag{
 	unsigned int downthreshold;
 	unsigned int upthreshold;
 }mali_dvfs_threshold_table;
-extern mali_dvfs_table mali_dvfs[4];
-extern mali_dvfs_threshold_table mali_dvfs_threshold[4];
-
-unsigned int gv[4];
+extern mali_dvfs_table mali_dvfs[MALI_DVFS_STEPS];
+extern mali_dvfs_threshold_table mali_dvfs_threshold[MALI_DVFS_STEPS];
 
 static ssize_t gpu_voltage_show(struct device *dev, struct device_attribute *attr, char *buf) {
-	return sprintf(buf, "Step1: %d\nStep2: %d\nStep3: %d\n Step4: %d\n",
-		       mali_dvfs[0].vol, mali_dvfs[1].vol,mali_dvfs[2].vol, mali_dvfs[3].vol);
+
+	int i, len = 0;
+
+	if(buf) {
+		for(i = 0; i < MALI_DVFS_STEPS; i++)
+			len += sprintf(buf + len, "Step%d: %d\n", i+1, mali_dvfs[i].vol);
+	}
+	return len;
 }
 
 static ssize_t gpu_voltage_store(struct device *dev, struct device_attribute *attr, const char *buf,
 									size_t count) {
 	unsigned int ret = -EINVAL;
 	int i = 0;
+	unsigned int gv[MALI_DVFS_STEPS];
 
-	ret = sscanf(buf, "%d %d %d %d", &gv[0], &gv[1], &gv[2], &gv[3]);
-	if(ret!=4) return -EINVAL;
+	ret = sscanf(buf, "%d %d %d %d %d", &gv[0], &gv[1], &gv[2], &gv[3], &gv[4]);
+
+	if(ret != MALI_DVFS_STEPS)
+		return -EINVAL;
 
 	/* safety floor and ceiling - netarchy */
-	for( i = 0; i < 4; i++ ) {
+	for( i = 0; i < MALI_DVFS_STEPS; i++ ) {
 		if (gv[i] < MIN_VOLTAGE_GPU) {
 		    gv[i] = MIN_VOLTAGE_GPU;
 		}
 		else if (gv[i] > MAX_VOLTAGE_GPU) {
 		    gv[i] = MAX_VOLTAGE_GPU;
 		}
-		if(ret==4)
-		    mali_dvfs[i].vol=gv[i];
+		mali_dvfs[i].vol = gv[i];
 	}
 	return count;
 }
