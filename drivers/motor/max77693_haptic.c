@@ -22,8 +22,6 @@
 #include <linux/mfd/max77693.h>
 #include <linux/mfd/max77693-private.h>
 
-#define SEC_DEBUG_VIB
-
 struct max77693_haptic_data {
 	struct max77693_dev *max77693;
 	struct i2c_client *i2c;
