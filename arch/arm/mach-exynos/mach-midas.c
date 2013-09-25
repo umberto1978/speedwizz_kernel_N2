@@ -2181,12 +2181,13 @@ static unsigned int table_exynos4412_power[17] = {
 	1024, /* 1400 MHz */
 	1024, /* 1500 MHz */
 	1024, /* 1600 MHz */
-	1024, /* 1700 MHz */
+	1024, /* 1704 MHz */
 	1024, /* 1800 MHz */
+	1024, /* 1920 MHz */
 }; 
  
 static struct cputopo_power exynos4412_cpu_power = { 
-	.max  = 17, 
+	.max  = 18, 
 	.step = 100000, 
 	.table = table_exynos4412_power, 
 }; 
