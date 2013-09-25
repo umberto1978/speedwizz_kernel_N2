@@ -49,11 +49,33 @@
 struct cputopo_arm cpu_topology[NR_CPUS];
 
 /*
+ * cpu power scale management
+ * a per cpu data structure should be better because each cpu is mainly
+ * using its own cpu_power even it's not always true because of
+ * nohz_idle_balance
+ */
+
+static DEFINE_PER_CPU(unsigned int, cpu_scale);
+
+/*
  * cpu topology mask update management
  */
 
 static unsigned int prev_sched_mc_power_savings = 0;
 static unsigned int prev_sched_smt_power_savings = 0;
+
+/*
+ * Update the cpu power of the scheduler
+ */
+unsigned long arch_scale_freq_power(struct sched_domain *sd, int cpu)
+{
+	return per_cpu(cpu_scale, cpu);
+}
+
+void set_power_scale(unsigned int cpu, unsigned int power)
+{
+	per_cpu(cpu_scale, cpu) = power;
+}
 
 /*
  * default topology function
@@ -232,10 +254,10 @@ void store_cpu_topology(unsigned int cpuid)
 				& MPIDR_LEVEL0_MASK;
 			cpuid_topo->socket_id = (mpidr >> MPIDR_LEVEL1_SHIFT)
 				& MPIDR_LEVEL1_MASK;
-
-          cpuid_topo->id = read_cpuid_id() & ARM_FAMILY_MASK;
-
 		}
+
+		cpuid_topo->id = read_cpuid_id() & ARM_FAMILY_MASK;
+
 	} else {
 		/*
 		 * This is an uniprocessor system
@@ -289,13 +311,15 @@ void init_cpu_topology(void)
 	/* init core mask */
 	for_each_possible_cpu(cpu) {
 		struct cputopo_arm *cpu_topo = &(cpu_topology[cpu]);
-		
+
 		cpu_topo->id = -1;
 		cpu_topo->thread_id = -1;
 		cpu_topo->core_id =  -1;
 		cpu_topo->socket_id = -1;
 		cpumask_clear(&cpu_topo->core_sibling);
 		cpumask_clear(&cpu_topo->thread_sibling);
+
+		per_cpu(cpu_scale, cpu) = SCHED_POWER_SCALE;
 	}
 	smp_wmb();
 }
