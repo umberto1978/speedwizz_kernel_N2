@@ -971,6 +971,18 @@ config LTO_SLIM
 	  Do not generate all code twice. The object files will only contain
 	  LTO information. This lowers build time.
 
+config CC_GRAPHITE_OPTIMIZATION
+  	bool "Enable graphite optimizations"
+  	help
+	  Enabling this option will turn on -floop-interchange,
+ 	  -floop-strip-mine and -floop-block for KBUILD_CFLAGS.
+
+config CC_LINK_TIME_OPTIMIZATION
+	  bool "Enable link-time optimization"
+	  help
+	    Enabling this option will turn on -flto and
+	    -fno-toplevel-reorder for KBUILD_CFLAGS.
+
 config SYSCTL
 	bool
 

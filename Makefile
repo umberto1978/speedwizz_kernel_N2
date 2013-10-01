@@ -378,6 +378,15 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 	--sysroot=/home/kernel/android-ndk-r8e/platforms/android-14/arch-arm \
 	-pipe
 
+ifdef CONFIG_CC_GRAPHITE_OPTIMIZATION
+KBUILD_CFLAGS  += -floop-interchange -floop-strip-mine \
+       -floop-block
+endif
+
+ifdef CONFIG_CC_LINK_TIME_OPTIMIZATION
+KBUILD_CFLAGS  += -flto -fno-toplevel-reorder
+endif
+
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
