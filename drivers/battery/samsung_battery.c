@@ -1636,7 +1636,6 @@ charge_ok:
 #else
 		battery_charge_control(info, info->pdata->chg_curr_usb,
 						info->pdata->chg_curr_usb);
-#endif
 		break;
 	case POWER_SUPPLY_TYPE_USB_CDP:
 		if (!info->pdata->suspend_chging)
@@ -1657,7 +1656,6 @@ charge_ok:
 #else
 		battery_charge_control(info, info->pdata->chg_curr_cdp,
 						info->pdata->chg_curr_cdp);
-#endif
 		break;
 	case POWER_SUPPLY_TYPE_DOCK:
 		if (!info->pdata->suspend_chging)
@@ -1686,7 +1684,6 @@ charge_ok:
 			battery_charge_control(info,
 						DOCK_TYPE_AUDIO_CURR,
 						DOCK_TYPE_AUDIO_CURR);
-#endif
 			break;
 		case CABLE_TYPE_SMARTDOCK_TA_MUIC:
 			if (info->cable_sub_type == ONLINE_SUB_TYPE_SMART_OTG) {
@@ -1709,7 +1706,6 @@ charge_ok:
 				battery_charge_control(info,
 						DOCK_TYPE_SMART_OTG_CURR,
 						DOCK_TYPE_SMART_OTG_CURR);
-#endif
 			} else {
 				pr_info("%s: smart dock ta & no host, %d\n",
 					__func__, DOCK_TYPE_SMART_NOTG_CURR);
@@ -1730,7 +1726,6 @@ charge_ok:
 				battery_charge_control(info,
 						DOCK_TYPE_SMART_NOTG_CURR,
 						DOCK_TYPE_SMART_NOTG_CURR);
-#endif
 			}
 			break;
 		case CABLE_TYPE_SMARTDOCK_USB_MUIC:
@@ -1761,7 +1756,6 @@ charge_ok:
 		battery_charge_control(info,
 			info->pdata->chg_curr_dock,
 			info->pdata->chg_curr_dock);
-#endif
 			break;
 		}
 		break;
@@ -1789,7 +1783,6 @@ charge_ok:
 #else
 		battery_charge_control(info, info->pdata->chg_curr_wpc,
 						info->pdata->chg_curr_wpc);
-#endif
 		break;
 	default:
 		break;
