@@ -369,14 +369,22 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
+SPEED_FLAGS   = -funswitch-loops -fpredictive-commoning -fgcse-after-reload \
+        	-fmodulo-sched -fmodulo-sched-allow-regmoves \
+        	-fipa-cp-clone -pipe \
+	 	-fgraphite-identity -fsched-spec-load \
+	 	-floop-interchange -floop-strip-mine -floop-block \
+	 	-fpredictive-commoning -fgcse-after-reload -ftree-vectorize -fipa-cp-clone \
+	 	-fmodulo-sched -fmodulo-sched-allow-regmoves
+
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
-		   -Wno-format-security \
+		   -Wno-format-security -Wno-array-bounds \
 		   -fno-delete-null-pointer-checks \
-	-march=armv7-a -mfloat-abi=softfp -mfpu=neon -mtune=cortex-a9 -fno-pic \
-	--sysroot=/home/kernel/android-ndk-r8e/platforms/android-14/arch-arm \
-	-pipe
+		   -mtune=cortex-a9 -march=armv7-a -mcpu=cortex-a9 -mfpu=neon -marm -ffast-math -fno-pic -munaligned-access \
+		   -ftree-loop-distribution -floop-parallelize-all -ftree-parallelize-loops=4
+#		   $(SPEED_FLAGS)
 
 ifdef CONFIG_CC_GRAPHITE_OPTIMIZATION
 KBUILD_CFLAGS  += -floop-interchange -floop-strip-mine \
