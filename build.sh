@@ -1,11 +1,11 @@
 #!/bin/sh
 
-if [ ! -e /home/umberto1978/android/release-tools/bmp2splash/bmp2splash ]; then
-      echo "make bmp2splash..."
-      make -C /home/umberto1978/android/release-tools/bmp2splash
-  fi
+#if [ ! -e /home/umberto1978/android/release-tools/bmp2splash/bmp2splash ]; then
+#      echo "make bmp2splash..."
+#      make -C /home/umberto1978/android/release-tools/bmp2splash
+#  fi
 
-/home/umberto1978/android/release-tools/bmp2splash/bmp2splash /home/umberto1978/android/logo/speedwizz_logo.bmp > /home/umberto1978/android/speedwizz_kernel_N2/drivers/video/samsung/logo_rgb24_user.h
+#/home/umberto1978/android/release-tools/bmp2splash/bmp2splash /home/umberto1978/android/logo/speedwizz_logo.bmp > /home/umberto1978/android/speedwizz_kernel_N2/drivers/video/samsung/logo_rgb24_user.h
 export USER_BOOT_SPLASH=y
 
 echo "Move to our working directory first"
