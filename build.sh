@@ -69,7 +69,6 @@ sleep 3
 
 echo "now build ramdisk"
 cd /home/umberto1978/android/ramdisk-folder
-rm *~
 sleep 3
 
 echo "erasing old modules and zImage"
