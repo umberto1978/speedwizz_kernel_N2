@@ -469,7 +469,6 @@ struct tsp_cmd tsp_cmds[] = {
 static struct input_dev *slide2wake_dev;
 extern void request_suspend_state(int);
 extern int get_suspend_state(void);
-static DEFINE_MUTEX(s2w_lock);
 static struct wake_lock wl_s2w;
 bool s2w_enabled = false;
 static unsigned int wake_start = -1;
@@ -477,20 +476,6 @@ static unsigned int wake_start_y = -100;
 static unsigned int x_lo;
 static unsigned int x_hi;
 static unsigned int y_tolerance = 132;
-
-static void slide2wake_force_wakeup(void)
-{
-  int state;
-
-  mutex_lock(&s2w_lock);
-  state = get_suspend_state();
-  printk(KERN_ERR "[TSP] suspend state: %d\n", state);
-  if (state != 0)
-    request_suspend_state(0);
-  msleep(100);
-  mutex_unlock(&s2w_lock);
-}
-
 void slide2wake_setdev(struct input_dev *input_device)
 {
   slide2wake_dev = input_device;
@@ -1091,7 +1076,6 @@ static irqreturn_t mms_ts_interrupt(int irq, void *dev_id)
 			&& 	abs(wake_start_y - y) < y_tolerance ) {
 				printk(KERN_ERR "[TSP] slide2wake up at: %4d\n",
 					x);
-				slide2wake_force_wakeup();
 				slide2wake_pwrtrigger();
 			}
 			wake_start = -1;
