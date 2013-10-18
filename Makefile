@@ -383,7 +383,6 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -Wno-format-security -Wno-array-bounds \
 		   -fno-delete-null-pointer-checks \
 		   -mtune=cortex-a9 -march=armv7-a -mcpu=cortex-a9 -mfpu=neon -marm -ffast-math -fno-pic -munaligned-access \
-		   -fno-schedule-insns2
 		   -ftree-loop-distribution -floop-parallelize-all -ftree-parallelize-loops=4
 #		   $(SPEED_FLAGS)
 

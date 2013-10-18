@@ -74,9 +74,10 @@ sleep 3
 echo "erasing old modules and zImage"
 cd /home/umberto1978/android/ramdisk-folder/lib/modules
 rm -f btlock*
-rm -f exfat_core*
+rm -f commkm*
 rm -f logger*
-rm -f exfat_fs*
+rm -f mvpkm*
+rm -f pvtcpkm*
 rm -f dhd*
 rm -f scsi_wait_scan*
 cd /home/umberto1978/android/boot-images
