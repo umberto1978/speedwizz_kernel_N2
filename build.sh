@@ -9,7 +9,7 @@
 export USER_BOOT_SPLASH=y
 
 echo "Move to our working directory first"
-cd /home/umberto1978/android/TEST_4.3/GT-N7100_JB_Opensource_Update3/kernel2
+cd /home/umberto1978/android/jb_4-3/speedwizz_kernel_N2
 echo "Done"
 sleep 3
 
@@ -44,7 +44,7 @@ echo "Done"
 sleep 3
 
 echo "Now move to source directory and copy new zImage to the compiled directory"
-cd /home/umberto1978/android/TEST_4.3/GT-N7100_JB_Opensource_Update3/kernel2/arch/arm/boot
+cd /home/umberto1978/android/jb_4-3/speedwizz_kernel_N2/arch/arm/boot
 if [ -f zImage ]; then cp zImage /home/umberto1978/android/compiled/;
 echo "Done, zImage copied";
 else echo "No zImage found!! Exiting program!";
@@ -57,7 +57,7 @@ cd /home/umberto1978/android/compiled
 if [ -d modules ]; then rm -rf modules;
 fi
 mkdir /home/umberto1978/android/compiled/modules;
-cd /home/umberto1978/android/TEST_4.3/GT-N7100_JB_Opensource_Update3/kernel2/drivers
+cd /home/umberto1978/android/jb_4-3/speedwizz_kernel_N2/drivers
 find . -name "*.ko" -exec cp {} /home/umberto1978/android/compiled/modules/ \;
 echo "done"
 sleep 3
@@ -119,7 +119,7 @@ echo "DONE!"
 sleep 3
 
 echo "Uploading zip and tar to my dropbox!"
-cd /home/umberto1978/android/TEST_4.3/GT-N7100_JB_Opensource_Update3/kernel2
+cd /home/umberto1978/android/jb_4-3/speedwizz_kernel_N2
 ./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_ALPHA_*.zip test_kernel
 ./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_ALPHA_*.tar test_kernel
 echo "DONE!"
