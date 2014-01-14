@@ -327,3 +327,4 @@ int g2d_init_mem(struct device *dev, unsigned int *base, unsigned int *size)
 #endif
 	return 0;
 }
+

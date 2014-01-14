@@ -65,8 +65,6 @@ extern void printascii(char *);
 #define MINIMUM_CONSOLE_LOGLEVEL 1 /* Minimum loglevel we let people use */
 #define DEFAULT_CONSOLE_LOGLEVEL 7 /* anything MORE serious than KERN_DEBUG */
 
-#define SPEEDMOD_DISABLE_PRINTK //SpeedMod: Disable printk output if defined
-
 DECLARE_WAIT_QUEUE_HEAD(log_wait);
 
 int console_printk[4] = {
@@ -206,7 +204,7 @@ void __init setup_log_buf(int early)
 		unsigned long mem;
 
 		mem = memblock_alloc(new_log_buf_len, PAGE_SIZE);
-		if (mem == MEMBLOCK_ERROR)
+		if (!mem)
 			return;
 		new_log_buf = __va(mem);
 	} else {
@@ -842,7 +840,6 @@ static int have_callable_console(void)
 
 asmlinkage int printk(const char *fmt, ...)
 {
-#ifndef SPEEDMOD_DISABLE_PRINTK //SpeedMod: Disable printk
 	va_list args;
 	int r;
 
@@ -859,9 +856,6 @@ asmlinkage int printk(const char *fmt, ...)
 	va_end(args);
 
 	return r;
-#else //SpeedMod: Disable printk
-	return 0;
-#endif
 }
 
 /* cpu currently holding logbuf_lock */
@@ -936,7 +930,6 @@ static inline void printk_delay(void)
 
 asmlinkage int vprintk(const char *fmt, va_list args)
 {
-#ifndef SPEEDMOD_DISABLE_PRINTK //SpeedMod: Disable printk
 	int printed_len = 0;
 	int current_log_level = default_message_loglevel;
 	unsigned long flags;
@@ -1102,9 +1095,6 @@ out_restore_irqs:
 
 	preempt_enable();
 	return printed_len;
-#else //SpeedMod: Disable printk
-	return 0;
-#endif
 }
 EXPORT_SYMBOL(printk);
 EXPORT_SYMBOL(vprintk);

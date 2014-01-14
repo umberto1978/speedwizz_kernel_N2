@@ -355,7 +355,7 @@ config AUDIT
 
 config AUDITSYSCALL
 	bool "Enable system-call auditing support"
-	depends on AUDIT && (X86 || PPC || S390 || IA64 || UML || SPARC64 || SUPERH)
+	depends on AUDIT && (X86 || PPC || S390 || IA64 || UML || SPARC64 || SUPERH || ARM)
 	default y if SECURITY_SELINUX
 	help
 	  Enable low-overhead system-call auditing infrastructure that
@@ -398,24 +398,6 @@ config TREE_PREEMPT_RCU
 	  thousands of CPUs, but for which real-time response
 	  is also required.  It also scales down nicely to
 	  smaller systems.
-	  
-config JRCU
-       bool "An RCU suitable for small SMP systems"
-       depends on PREEMPT
-       depends on SMP
-       select PREEMPT_COUNT_CPU
-       help
-         This option selects a minimal-footprint RCU that is most suitable
-         for small SMP systems  -- 'small' in this case meaning all but
-         the largest NUMA systems.  It is not clear how big 'small' can
-         be, but it is known to work well on NUMA platforms having 80 CPUs.
-
-         jRCU may also be a good choice for systems with low latency
-         requirements.  It does RCU garbage collection from a single
-         CPU rather than have each CPU do its own.  This frees up all
-         but one CPU from interference by this periodic requirement.
-
-         Most users should say N here.
 
 config TINY_RCU
 	bool "UP-only small-memory-footprint RCU"
@@ -441,57 +423,6 @@ config PREEMPT_RCU
 	help
 	  This option enables preemptible-RCU code that is common between
 	  the TREE_PREEMPT_RCU and TINY_PREEMPT_RCU implementations.
-	  
-config JRCU_DAEMON
-       bool
-       depends on JRCU
-       default y
-       help
-         Required. The context switch when leaving the daemon is needed
-         to get the CPU to reliably participate in end-of-batch processing.
-
-config JRCU_DAEMON_PRIO
-       int "JRCU Daemon priority"
-       depends on JRCU_DAEMON
-       default 0
-       help
-         The JRCU daemon priority. If 0 then the daemon runs SCHED_OTHER.
-         If >0 then the daemon runs SCHED_RR and its priority will be
-         the value selected.  If <0 then SCHED_RR is again selected,
-         but now its priority will be the biased downwards from the
-         maximum possible Posix priority.
-
-         If unsure, select 0.  The other values are useful only for those
-         rare setups where 100% of every CPU's utilization will be spent in
-         user SCHED_RR or SCHED_FIFO applications, for long periods of time.
-
-
-config JRCU_LAZY
-       bool "Should JRCU be lazy recognizing end-of-batch"
-       depends on JRCU
-       default n
-       help
-         If you say Y here, JRCU will on occasion fail to recognize
-         end-of-batch for an rcu period or two.
-
-         If you say N here, JRCU will be more aggressive; in fact it
-         will always recognize end-of-batch at the earliest possible time.
-
-         Being lazy should be fractionally more efficient in that JRCU
-         inserts fewer memory barriers along some high performance kernel
-         code paths.
-
-         If unsure, say N.
-
-config PREEMPT_COUNT_CPU
-       # bool "Let one CPU look at another CPUs preemption count"
-       bool
-       default n
-       help
-         If Y then the preempt_count_cpu() function will be compiled into
-         the kernel.  Its existance impacts kernel performance slightly,
-         so this option should be selected only if other kernel features
-         that use preempt_count_cpu() are also selected.
 
 config RCU_TRACE
 	bool "Enable tracing for RCU"
@@ -983,75 +914,6 @@ config CC_CHECK_WARNING_STRICTLY
 	help
 	  Enabling this option will pass "-Werror" to gcc
 
-config LTO_MENU
-	bool "Enable gcc link time optimizations"
-	# Only tested on X86 for now. For other architectures you likely
-	# have to fix some things first, like adding asmlinkages etc.
-	depends on EXPERIMENTAL
-	# lto does not support excluding flags for specific files
-	# right now. Can be removed if that is fixed.
-	depends on !FUNCTION_TRACER
-	help
-	  With this option gcc will do whole program optimizations for
-	  the whole kernel and module. This increases compile time, but can
-	  lead to better code. It allows gcc to inline functions between
-	  different files. It might also trigger bugs due to more
-	  aggressive optimization. It allows gcc to drop unused code.
-	  With this option gcc will also do some global checking over
-	  different source files.
-
-	  This requires a gcc 4.7 or later compiler and
-	  Linux binutils 2.21.51.0.3 or later.  It does not currently
-	  work with a FSF release of binutils or with gold.
-
-	  On larger configurations this may need more than 4GB of RAM.
-	  It will likely not work on those with a 32bit compiler. Also
-	  /tmp in tmpfs may lead to faster running out of RAM
-	  (in this case set the TMPDIR environment variable to a different
-	  directory directly on disk)
-
-	  When the toolchain support is not available this will (hopefully)
-	  be automatically disabled.
-
-	  For more information see Documentation/lto-build
-
-config LTO_DISABLE
-         bool "Disable LTO again"
-         depends on LTO_MENU
-         default n
-         help
-           This option is merely here so that allyesconfig or allmodconfig does
-           not enable LTO. If you want to actually use LTO do not enable.
-
-config LTO
-	bool
-	default y
-	depends on LTO_MENU && !LTO_DISABLE
-
-config LTO_DEBUG
-	bool "Enable LTO compile time debugging"
-	depends on LTO
-
-config LTO_SLIM
-	bool "Use slim lto"
-	# need to fix modpost for it
-	depends on LTO && BROKEN
-	help
-	  Do not generate all code twice. The object files will only contain
-	  LTO information. This lowers build time.
-
-config CC_GRAPHITE_OPTIMIZATION
-  	bool "Enable graphite optimizations"
-  	help
-	  Enabling this option will turn on -floop-interchange,
- 	  -floop-strip-mine and -floop-block for KBUILD_CFLAGS.
-
-config CC_LINK_TIME_OPTIMIZATION
-	  bool "Enable link-time optimization"
-	  help
-	    Enabling this option will turn on -flto and
-	    -fno-toplevel-reorder for KBUILD_CFLAGS.
-
 config SYSCTL
 	bool
 
@@ -1106,8 +968,7 @@ config KALLSYMS
 
 config KALLSYMS_ALL
 	bool "Include all symbols in kallsyms"
-	#depends on DEBUG_KERNEL && KALLSYMS
-	depends on KALLSYMS
+	depends on DEBUG_KERNEL && KALLSYMS
 	help
 	   Normally kallsyms only contains the symbols of functions for nicer
 	   OOPS messages and backtraces (i.e., symbols from the text and inittext
@@ -1504,7 +1365,6 @@ config MODULE_FORCE_UNLOAD
 
 config MODVERSIONS
 	bool "Module versioning support"
-	depends on !LTO
 	help
 	  Usually, you have to use modules compiled with your kernel.
 	  Saying Y here makes it sometimes possible to use modules

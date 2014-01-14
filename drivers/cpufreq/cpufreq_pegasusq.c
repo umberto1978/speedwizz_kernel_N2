@@ -176,20 +176,13 @@ static unsigned int get_nr_run_avg(void)
 #define DEF_START_DELAY				(0)
 
 #define UP_THRESHOLD_AT_MIN_FREQ		(40)
-#define FREQ_FOR_RESPONSIVENESS			(400000)
+#define FREQ_FOR_RESPONSIVENESS			(500000)
 /* for fast decrease */
 #define FREQ_FOR_FAST_DOWN				(1200000)
 #define UP_THRESHOLD_AT_FAST_DOWN		(95)
 
 #define HOTPLUG_DOWN_INDEX			(0)
 #define HOTPLUG_UP_INDEX			(1)
-
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-#define LCD_FREQ_KICK_IN_DOWN_DELAY    (20)
-#define LCD_FREQ_KICK_IN_FREQ      (500000)
-
-extern int _lcdfreq_lock(int lock);
-#endif
 
 #ifdef CONFIG_MACH_MIDAS
 static int hotplug_rq[4][2] = {
@@ -284,12 +277,6 @@ static struct dbs_tuners {
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	int early_suspend;
 #endif
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-  int lcdfreq_enable;
-  unsigned int lcdfreq_kick_in_down_delay;
-  unsigned int lcdfreq_kick_in_down_left;
-  unsigned int lcdfreq_kick_in_freq;
-#endif
 	unsigned int up_threshold_at_min_freq;
 	unsigned int freq_for_responsiveness;
 } dbs_tuners_ins = {
@@ -312,12 +299,6 @@ static struct dbs_tuners {
 #endif
 	.up_threshold_at_min_freq = UP_THRESHOLD_AT_MIN_FREQ,
 	.freq_for_responsiveness = FREQ_FOR_RESPONSIVENESS,
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-	.lcdfreq_enable = false,
-	.lcdfreq_kick_in_down_delay = LCD_FREQ_KICK_IN_DOWN_DELAY,
-	.lcdfreq_kick_in_down_left = LCD_FREQ_KICK_IN_DOWN_DELAY,
-	.lcdfreq_kick_in_freq = LCD_FREQ_KICK_IN_FREQ,
-#endif
 };
 
 
@@ -341,7 +322,7 @@ static void apply_hotplug_lock(void)
 	lock = atomic_read(&g_hotplug_lock);
 	flag = lock - online;
 
-	if (flag == 0)
+	if (lock == 0 || flag == 0)
 		return;
 
 	work = flag > 0 ? &dbs_info->up_work : &dbs_info->down_work;
@@ -415,6 +396,13 @@ void cpufreq_pegasusq_min_cpu_unlock(void)
 	lock = atomic_read(&g_hotplug_lock);
 	if (lock == 0)
 		return;
+#if defined(CONFIG_HAS_EARLYSUSPEND) && EARLYSUSPEND_HOTPLUGLOCK
+	if (dbs_tuners_ins.early_suspend >= 0) { /* if LCD is off-state */
+		atomic_set(&g_hotplug_lock, 1);
+		apply_hotplug_lock();
+		return;
+	}
+#endif
 	flag = lock - online;
 	if (flag >= 0)
 		return;
@@ -504,17 +492,26 @@ show_one(min_cpu_lock, min_cpu_lock);
 show_one(dvfs_debug, dvfs_debug);
 show_one(up_threshold_at_min_freq, up_threshold_at_min_freq);
 show_one(freq_for_responsiveness, freq_for_responsiveness);
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-show_one(lcdfreq_enable, lcdfreq_enable);
-show_one(lcdfreq_kick_in_down_delay, lcdfreq_kick_in_down_delay);
-show_one(lcdfreq_kick_in_freq, lcdfreq_kick_in_freq);
-#endif
-
 static ssize_t show_hotplug_lock(struct kobject *kobj,
 				struct attribute *attr, char *buf)
 {
 	return sprintf(buf, "%d\n", atomic_read(&g_hotplug_lock));
 }
+
+static ssize_t show_cpucore_table(struct kobject *kobj,
+				struct attribute *attr, char *buf)
+{
+	ssize_t count = 0;
+	int i;
+	
+	for (i = CONFIG_NR_CPUS; i > 0; i--) {
+		count += sprintf(&buf[count], "%d ", i);
+	}
+	count += sprintf(&buf[count], "\n");
+
+	return count;
+}
+
 
 #define show_hotplug_param(file_name, num_core, up_down)		\
 static ssize_t show_##file_name##_##num_core##_##up_down		\
@@ -591,62 +588,6 @@ define_one_global_rw(hotplug_rq_3_1);
 define_one_global_rw(hotplug_rq_4_0);
 #endif
 
-/**
- * update_sampling_rate - update sampling rate effective immediately if needed.
- * @new_rate: new sampling rate
- *
- * If new rate is smaller than the old, simply updaing
- * dbs_tuners_int.sampling_rate might not be appropriate. For example,
- * if the original sampling_rate was 1 second and the requested new sampling
- * rate is 10 ms because the user needs immediate reaction from ondemand
- * governor, but not sure if higher frequency will be required or not,
- * then, the governor may change the sampling rate too late; up to 1 second
- * later. Thus, if we are reducing the sampling rate, we need to make the
- * new value effective immediately.
- */
-static void update_sampling_rate(unsigned int new_rate)
-{
-	int cpu;
-
-	dbs_tuners_ins.sampling_rate = new_rate
-				     = max(new_rate, min_sampling_rate);
-
-	for_each_online_cpu(cpu) {
-		struct cpufreq_policy *policy;
-		struct cpu_dbs_info_s *dbs_info;
-		unsigned long next_sampling, appointed_at;
-
-		policy = cpufreq_cpu_get(cpu);
-		if (!policy)
-			continue;
-		dbs_info = &per_cpu(od_cpu_dbs_info, policy->cpu);
-		cpufreq_cpu_put(policy);
-
-		mutex_lock(&dbs_info->timer_mutex);
-
-		if (!delayed_work_pending(&dbs_info->work)) {
-			mutex_unlock(&dbs_info->timer_mutex);
-			continue;
-		}
-
-		next_sampling  = jiffies + usecs_to_jiffies(new_rate);
-		appointed_at = dbs_info->work.timer.expires;
-
-
-		if (time_before(next_sampling, appointed_at)) {
-
-			mutex_unlock(&dbs_info->timer_mutex);
-			cancel_delayed_work_sync(&dbs_info->work);
-			mutex_lock(&dbs_info->timer_mutex);
-
-			schedule_delayed_work_on(dbs_info->cpu, &dbs_info->work,
-						 usecs_to_jiffies(new_rate));
-
-		}
-		mutex_unlock(&dbs_info->timer_mutex);
-	}
-}
-
 static ssize_t store_sampling_rate(struct kobject *a, struct attribute *b,
 				   const char *buf, size_t count)
 {
@@ -655,7 +596,7 @@ static ssize_t store_sampling_rate(struct kobject *a, struct attribute *b,
 	ret = sscanf(buf, "%u", &input);
 	if (ret != 1)
 		return -EINVAL;
-	update_sampling_rate(input);
+	dbs_tuners_ins.sampling_rate = max(input, min_sampling_rate);
 	return count;
 }
 
@@ -909,55 +850,6 @@ static ssize_t store_freq_for_responsiveness(struct kobject *a, struct attribute
 	dbs_tuners_ins.freq_for_responsiveness = input;
 	return count;
 }
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-static ssize_t store_lcdfreq_enable(struct kobject *a, struct attribute *b,
-             const char *buf, size_t count)
-{
-  unsigned int input;
-  int ret;
-
-  ret = sscanf(buf, "%u", &input);
-  if (ret != 1)
-    return -EINVAL;
-
-  if (input > 0)
-    dbs_tuners_ins.lcdfreq_enable = true;
-  else
-    dbs_tuners_ins.lcdfreq_enable = false;
-
-  return count;
-}
-
-static ssize_t store_lcdfreq_kick_in_down_delay(struct kobject *a, struct attribute *b,
-           const char *buf, size_t count)
-{
-  unsigned int input;
-  int ret;
-
-  ret = sscanf(buf, "%u", &input);
-  if (ret != 1 && input < 0)
-    return -EINVAL;
-
-  dbs_tuners_ins.lcdfreq_kick_in_down_delay = input;
-  dbs_tuners_ins.lcdfreq_kick_in_down_left =
-          dbs_tuners_ins.lcdfreq_kick_in_down_delay;
-  return count;
-}
-
-static ssize_t store_lcdfreq_kick_in_freq(struct kobject *a, struct attribute *b,
-           const char *buf, size_t count)
-{
-  unsigned int input;
-  int ret;
-
-  ret = sscanf(buf, "%u", &input);
-  if (ret != 1)
-    return -EINVAL;
-
-  dbs_tuners_ins.lcdfreq_kick_in_freq = input;
-  return count;
-}
-#endif
 
 define_one_global_rw(sampling_rate);
 define_one_global_rw(up_threshold);
@@ -976,11 +868,8 @@ define_one_global_rw(hotplug_lock);
 define_one_global_rw(dvfs_debug);
 define_one_global_rw(up_threshold_at_min_freq);
 define_one_global_rw(freq_for_responsiveness);
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-define_one_global_rw(lcdfreq_enable);
-define_one_global_rw(lcdfreq_kick_in_down_delay);
-define_one_global_rw(lcdfreq_kick_in_freq);
-#endif
+
+define_one_global_ro(cpucore_table);
 
 static struct attribute *dbs_attributes[] = {
 	&sampling_rate_min.attr,
@@ -1019,11 +908,7 @@ static struct attribute *dbs_attributes[] = {
 #endif
 	&up_threshold_at_min_freq.attr,
 	&freq_for_responsiveness.attr,
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-	&lcdfreq_enable.attr,
-	&lcdfreq_kick_in_down_delay.attr,
-	&lcdfreq_kick_in_freq.attr,
-#endif
+	&cpucore_table.attr,
 	NULL
 };
 
@@ -1370,22 +1255,12 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 			this_dbs_info->rate_mult =
 				dbs_tuners_ins.sampling_down_factor;
 		dbs_freq_increase(policy, target);
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-    if(dbs_tuners_ins.lcdfreq_enable) {
-      if(target > dbs_tuners_ins.lcdfreq_kick_in_freq) {
-        dbs_tuners_ins.lcdfreq_kick_in_down_left =
-          dbs_tuners_ins.lcdfreq_kick_in_down_delay;
-        _lcdfreq_lock(0);
-      } else 
-        dbs_tuners_ins.lcdfreq_kick_in_down_left--;
-    }
-#endif
 		return;
 	}
 
 	/* Check for frequency decrease */
-	/* if we cannot reduce the frequency anymore, break out early */
 #ifndef CONFIG_ARCH_EXYNOS4
+	/* if we cannot reduce the frequency anymore, break out early */
 	if (policy->cur == policy->min)
 		return;
 #endif
@@ -1419,18 +1294,6 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		if (freq_next < dbs_tuners_ins.freq_for_responsiveness
 			&& (max_load_freq / freq_next) > down_thres)
 			freq_next = dbs_tuners_ins.freq_for_responsiveness;
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-    if(dbs_tuners_ins.lcdfreq_enable) {
-      if(dbs_tuners_ins.lcdfreq_kick_in_freq < freq_next) {
-        dbs_tuners_ins.lcdfreq_kick_in_down_left =
-          dbs_tuners_ins.lcdfreq_kick_in_down_delay;
-      } else if(dbs_tuners_ins.lcdfreq_kick_in_down_left <= 0) {
-        _lcdfreq_lock(1);
-      } else {
-        dbs_tuners_ins.lcdfreq_kick_in_down_left--;
-      }
-    }
-#endif
 
 		if (policy->cur == freq_next)
 			return;
@@ -1462,15 +1325,6 @@ static void do_dbs_timer(struct work_struct *work)
 	queue_delayed_work_on(cpu, dvfs_workqueue, &dbs_info->work, delay);
 	mutex_unlock(&dbs_info->timer_mutex);
 }
-
-/* This is coming from AndreiLux patch but it's not used as originally was a sub-condition on Flexrate mechanism (i am using touchboost instead)
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-	if(dbs_tuners_ins.lcdfreq_enable) {
-		_lcdfreq_lock(0);
-		dbs_tuners_ins.lcdfreq_kick_in_down_left =
-				  dbs_tuners_ins.lcdfreq_kick_in_down_delay;
-	}
-#endif */
 
 static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 {
@@ -1537,18 +1391,11 @@ static struct notifier_block reboot_notifier = {
 static struct early_suspend early_suspend;
 unsigned int prev_freq_step;
 unsigned int prev_sampling_rate;
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-int prev_lcdfreq_enable;
-#endif
 static void cpufreq_pegasusq_early_suspend(struct early_suspend *h)
 {
 #if EARLYSUSPEND_HOTPLUGLOCK
 	dbs_tuners_ins.early_suspend =
 		atomic_read(&g_hotplug_lock);
-#endif
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-  prev_lcdfreq_enable = dbs_tuners_ins.lcdfreq_enable;
-  dbs_tuners_ins.lcdfreq_enable = false;
 #endif
 	prev_freq_step = dbs_tuners_ins.freq_step;
 	prev_sampling_rate = dbs_tuners_ins.sampling_rate;
@@ -1565,9 +1412,6 @@ static void cpufreq_pegasusq_late_resume(struct early_suspend *h)
 {
 #if EARLYSUSPEND_HOTPLUGLOCK
 	atomic_set(&g_hotplug_lock, dbs_tuners_ins.early_suspend);
-#endif
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-  dbs_tuners_ins.lcdfreq_enable = prev_lcdfreq_enable;
 #endif
 	dbs_tuners_ins.early_suspend = -1;
 	dbs_tuners_ins.freq_step = prev_freq_step;
@@ -1652,9 +1496,6 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 #endif
 #if !EARLYSUSPEND_HOTPLUGLOCK
 		unregister_pm_notifier(&pm_notifier);
-#endif
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
-    _lcdfreq_lock(0);
 #endif
 
 		dbs_timer_exit(this_dbs_info);

@@ -101,13 +101,14 @@ config CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
 	  driver. Fallback governor will be the performance governor.
 
 config CPU_FREQ_DEFAULT_GOV_ZZMOOVE
-  	bool "zzmoove"
-  	select CPU_FREQ_GOV_ZZMOOVE
-  	select CPU_FREQ_GOV_PERFORMANCE
-  	help
-    	Use the CPUFreq governor 'zzmoove' as default, using predefined
-    	frequency lookup tables and optimized scaling triggers instead of
-    	% frequency steps to get smooth up/downscaling dependant on CPU load.
+    bool "zzmoove"
+    select CPU_FREQ_GOV_ZZMOOVE
+    select CPU_FREQ_GOV_PERFORMANCE
+    help
+      Use the CPUFreq governor 'zzmoove' as default, using predefined
+      frequency lookup tables and optimized scaling triggers instead of
+      % frequency steps to get smooth up/downscaling dependant on CPU load.
+
 
 config CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 	bool "interactive"
@@ -117,12 +118,6 @@ config CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 	  you to get a full dynamic cpu frequency capable system by simply
 	  loading your cpufreq low-level hardware driver, using the
 	  'interactive' governor for latency-sensitive workloads.
-
-config CPU_FREQ_DEFAULT_GOV_LIONHEART
-       bool "lionheart"
-       select CPU_FREQ_GOV_LIONHEART
-       help
-         Use the CPUFreq governor 'Lionheart' as default.
 
 config CPU_FREQ_DEFAULT_GOV_ADAPTIVE
 	bool "adaptive"
@@ -139,8 +134,9 @@ config CPU_FREQ_DEFAULT_GOV_PEGASUSQ
 	select CPU_FREQ_GOV_PEGASUSQ
 
 config CPU_FREQ_DEFAULT_GOV_LULZACTIVEQ
-	bool "lulzactiveq"
-	select CPU_FREQ_GOV_LULZACTIVEQ
+  bool "lulzactiveq"
+  select CPU_FREQ_GOV_LULZACTIVEQ
+
 
 endchoice
 
@@ -198,12 +194,6 @@ config CPU_FREQ_GOV_ONDEMAND
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
-
-config CPU_FREQ_GOV_LIONHEART
-       tristate "'Lionheart' cpufreq governor"
-       depends on CPU_FREQ
-       help
-         'Lionheart' - A brave and agile conservative-based governor.
 
 config CPU_FREQ_GOV_ONDEMAND_FLEXRATE
 	bool "flexrate interface for 'ondemand' cpufreq policy governor"
@@ -268,12 +258,12 @@ config CPU_FREQ_GOV_CONSERVATIVE
 	  If in doubt, say N.
 
 config CPU_FREQ_GOV_ZZMOOVE
-	  tristate "'zzmoove' cpufreq governor"
-	  depends on CPU_FREQ
-	  help
-	    'zzmoove' - based on cpufreq_conservative, using predefined
-	    frequency lookup tables and optimized scaling triggers instead of
-	    % frequency steps to get smooth up/downscaling dependant on CPU load.
+    tristate "'zzmoove' cpufreq governor"
+    depends on CPU_FREQ
+    help
+      'zzmoove' - based on cpufreq_conservative, using predefined
+      frequency lookup tables and optimized scaling triggers instead of
+      % frequency steps to get smooth up/downscaling dependant on CPU load.
  
             If in doubt, say N.
 

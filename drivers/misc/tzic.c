@@ -29,65 +29,63 @@
 #include <asm/smc.h>
 
 #define TZIC_DEV "tzic"
-#define SMC_CMD_STORE_BINFO	 (-201)
+#define SMC_CMD_STORE_BINFO         (-201)
 
 static int gotoCpu0(void);
 static int gotoAllCpu(void) __attribute__ ((unused));
 
 u32 exynos_smc1(u32 cmd, u32 arg1, u32 arg2, u32 arg3)
 {
-	register u32 reg0 __asm__("r0") = cmd;
-	register u32 reg1 __asm__("r1") = arg1;
-	register u32 reg2 __asm__("r2") = arg2;
-	register u32 reg3 __asm__("r3") = arg3;
+        register u32 reg0 __asm__("r0") = cmd;
+        register u32 reg1 __asm__("r1") = arg1;
+        register u32 reg2 __asm__("r2") = arg2;
+        register u32 reg3 __asm__("r3") = arg3;
 
-	__asm__ volatile (
-#ifdef REQUIRES_SEC
-		".arch_extension sec\n"
-#endif
-	"smc	0\n":"+r" (reg0), "+r"(reg1), "+r"(reg2),
-			  "+r"(reg3)
-	    );
+        __asm__ volatile (
+        ".arch_extension sec\n"
+        "smc        0\n"
+        : "+r"(reg0), "+r"(reg1), "+r"(reg2), "+r"(reg3)
+        );
 
-	return reg0;
+        return reg0;
 }
 
-#if defined(CONFIG_FELICA)
 int exynos_smc_read_oemflag(u32 ctrl_word, u32 *val)
 {
-	register u32 reg0 __asm__("r0");
-	register u32 reg1 __asm__("r1");
-	register u32 reg2 __asm__("r2");
-	register u32 reg3 __asm__("r3");
-	u32 idx = 0;
+        register u32 reg0 __asm__("r0");
+        register u32 reg1 __asm__("r1");
+        register u32 reg2 __asm__("r2");
+        register u32 reg3 __asm__("r3");
+        u32 idx = 0;
 
-	for (idx = 0; reg2 != ctrl_word; idx++) {
-		reg0 = -202;
-		reg1 = 1;
-		reg2 = idx;
+        for (idx = 0; reg2 != ctrl_word; idx++) {
+                reg0 = -202;
+                reg1 = 1;
+                reg2 = idx;
 
-		__asm__ volatile ("smc    0\n":"+r" (reg0), "+r"(reg1),
-				  "+r"(reg2), "+r"(reg3)
-		    );
-		if (reg1)
-			return -1;
-	}
+                __asm__ volatile (
+                ".arch_extension sec\n"
+                "smc    0\n" : "+r" (reg0), "+r"(reg2), "+r"(reg3)
+                );
+                if (reg1)
+                        return -1;
+        }
 
-	reg0 = -202;
-	reg1 = 1;
-	reg2 = idx;
+        reg0 = -202;
+        reg1 = 1;
+        reg2 = idx;
 
-	__asm__ volatile ("smc    0\n":"+r" (reg0), "+r"(reg1), "+r"(reg2),
-			  "+r"(reg3)
-	    );
-	if (reg1)
-		return -1;
+        __asm__ volatile (
+        ".arch_extension sec\n"
+        "smc    0\n" : "+r" (reg0), "+r"(reg1), "+r"(reg2), "+r"(reg3)
+        );
+        if (reg1)
+                return -1;
 
-	*val = reg2;
+        *val = reg2;
 
-	return 0;
+        return 0;
 }
-#endif
 
 static DEFINE_MUTEX(tzic_mutex);
 static struct class *driver_class;
@@ -101,126 +99,122 @@ static struct cdev tzic_cdev;
 
 static long tzic_ioctl(struct file *file, unsigned cmd, unsigned long arg)
 {
-	int ret = 0;
+        int ret = 0;
 
-	ret = gotoCpu0();
-	if (0 != ret) {
-		LOG(KERN_INFO "changing core failed!");
-		return -1;
-	}
+        ret = gotoCpu0();
+        if (0 != ret) {
+                LOG(KERN_INFO "changing core failed!");
+                return -1;
+        }
 
-	if (cmd == TZIC_IOCTL_SET_FUSE_REQ) {
-		LOG(KERN_INFO "set_fuse");
-		exynos_smc1(SMC_CMD_STORE_BINFO, 0x80010001, 0, 0);
-		exynos_smc1(SMC_CMD_STORE_BINFO, 0x00000001, 0, 0);
-	} else if (cmd == TZIC_IOCTL_GET_FUSE_REQ) {
-		LOG(KERN_INFO "get_fuse");
-#if defined(CONFIG_FELICA)
-		exynos_smc_read_oemflag(0x80010001, (u32 *) arg);
-#else
-		LOG(KERN_INFO "get_fuse not supported : CONFIG_FELICA");
-#endif
-	} else {
-		LOG(KERN_INFO "command error");
-	}
+        if (cmd == TZIC_IOCTL_SET_FUSE_REQ) {
+                LOG(KERN_INFO "set_fuse");
+                exynos_smc1(SMC_CMD_STORE_BINFO, 0x80010001, 0, 0);
+                exynos_smc1(SMC_CMD_STORE_BINFO, 0x00000001, 0, 0);
+        } else if (cmd == TZIC_IOCTL_GET_FUSE_REQ) {
+                LOG(KERN_INFO "get_fuse");
+                exynos_smc_read_oemflag(0x80010001, (u32 *) arg);
+        } else {
+                LOG(KERN_INFO "command error");
+        }
 
-	gotoAllCpu();
+        gotoAllCpu();
 
-	return 0;
+        return 0;
 }
 
 static const struct file_operations tzic_fops = {
-	.owner = THIS_MODULE,
-	.unlocked_ioctl = tzic_ioctl,
+        .owner = THIS_MODULE,
+        .unlocked_ioctl = tzic_ioctl,
 };
 
 static int __init tzic_init(void)
 {
-	int rc;
-	struct device *class_dev;
+        int rc;
+        struct device *class_dev;
 
-	rc = alloc_chrdev_region(&tzic_device_no, 0, 1, TZIC_DEV);
-	if (rc < 0) {
-		LOG(KERN_INFO "alloc_chrdev_region failed %d", rc);
-		return rc;
-	}
+        rc = alloc_chrdev_region(&tzic_device_no, 0, 1, TZIC_DEV);
+        if (rc < 0) {
+                LOG(KERN_INFO "alloc_chrdev_region failed %d", rc);
+                return rc;
+        }
 
-	driver_class = class_create(THIS_MODULE, TZIC_DEV);
-	if (IS_ERR(driver_class)) {
-		rc = -ENOMEM;
-		LOG(KERN_INFO "class_create failed %d", rc);
-		goto unregister_chrdev_region;
-	}
+        driver_class = class_create(THIS_MODULE, TZIC_DEV);
+        if (IS_ERR(driver_class)) {
+                rc = -ENOMEM;
+                LOG(KERN_INFO "class_create failed %d", rc);
+                goto unregister_chrdev_region;
+        }
 
-	class_dev = device_create(driver_class, NULL, tzic_device_no, NULL,
-				  TZIC_DEV);
-	if (!class_dev) {
-		LOG(KERN_INFO "class_device_create failed %d", rc);
-		rc = -ENOMEM;
-		goto class_destroy;
-	}
+        class_dev = device_create(driver_class, NULL, tzic_device_no, NULL,
+                                  TZIC_DEV);
+        if (!class_dev) {
+                LOG(KERN_INFO "class_device_create failed %d", rc);
+                rc = -ENOMEM;
+                goto class_destroy;
+        }
 
-	cdev_init(&tzic_cdev, &tzic_fops);
-	tzic_cdev.owner = THIS_MODULE;
+        cdev_init(&tzic_cdev, &tzic_fops);
+        tzic_cdev.owner = THIS_MODULE;
 
-	rc = cdev_add(&tzic_cdev, MKDEV(MAJOR(tzic_device_no), 0), 1);
-	if (rc < 0) {
-		LOG(KERN_INFO "cdev_add failed %d", rc);
-		goto class_device_destroy;
-	}
+        rc = cdev_add(&tzic_cdev, MKDEV(MAJOR(tzic_device_no), 0), 1);
+        if (rc < 0) {
+                LOG(KERN_INFO "cdev_add failed %d", rc);
+                goto class_device_destroy;
+        }
 
-	return 0;
+        return 0;
 
  class_device_destroy:
-	device_destroy(driver_class, tzic_device_no);
+        device_destroy(driver_class, tzic_device_no);
  class_destroy:
-	class_destroy(driver_class);
+        class_destroy(driver_class);
  unregister_chrdev_region:
-	unregister_chrdev_region(tzic_device_no, 1);
-	return rc;
+        unregister_chrdev_region(tzic_device_no, 1);
+        return rc;
 }
 
 static void __exit tzic_exit(void)
 {
-	device_destroy(driver_class, tzic_device_no);
-	class_destroy(driver_class);
-	unregister_chrdev_region(tzic_device_no, 1);
+        device_destroy(driver_class, tzic_device_no);
+        class_destroy(driver_class);
+        unregister_chrdev_region(tzic_device_no, 1);
 }
 
 static int gotoCpu0(void)
 {
-	int ret = 0;
-	struct cpumask mask = CPU_MASK_CPU0;
+        int ret = 0;
+        struct cpumask mask = CPU_MASK_CPU0;
 
-	LOG(KERN_INFO "System has %d CPU's, we are on CPU #%d\n"
-	    "\tBinding this process to CPU #0.\n"
-	    "\tactive mask is %lx, setting it to mask=%lx\n",
-	    nr_cpu_ids,
-	    raw_smp_processor_id(), cpu_active_mask->bits[0], mask.bits[0]);
-	ret = set_cpus_allowed_ptr(current, &mask);
-	if (0 != ret)
-		LOG(KERN_INFO "set_cpus_allowed_ptr=%d.\n", ret);
-	LOG(KERN_INFO "And now we are on CPU #%d", raw_smp_processor_id());
+        LOG(KERN_INFO "System has %d CPU's, we are on CPU #%d\n"
+            "\tBinding this process to CPU #0.\n"
+            "\tactive mask is %lx, setting it to mask=%lx\n",
+            nr_cpu_ids,
+            raw_smp_processor_id(), cpu_active_mask->bits[0], mask.bits[0]);
+        ret = set_cpus_allowed_ptr(current, &mask);
+        if (0 != ret)
+                LOG(KERN_INFO "set_cpus_allowed_ptr=%d.\n", ret);
+        LOG(KERN_INFO "And now we are on CPU #%d", raw_smp_processor_id());
 
-	return ret;
+        return ret;
 }
 
 static int gotoAllCpu(void)
 {
-	int ret = 0;
-	struct cpumask mask = CPU_MASK_ALL;
+        int ret = 0;
+        struct cpumask mask = CPU_MASK_ALL;
 
-	LOG(KERN_INFO "System has %d CPU's, we are on CPU #%d\n"
-	    "\tBinding this process to CPU #0.\n"
-	    "\tactive mask is %lx, setting it to mask=%lx\n",
-	    nr_cpu_ids,
-	    raw_smp_processor_id(), cpu_active_mask->bits[0], mask.bits[0]);
-	ret = set_cpus_allowed_ptr(current, &mask);
-	if (0 != ret)
-		LOG(KERN_INFO "set_cpus_allowed_ptr=%d.\n", ret);
-	LOG(KERN_INFO "And now we are on CPU #%d", raw_smp_processor_id());
+        LOG(KERN_INFO "System has %d CPU's, we are on CPU #%d\n"
+            "\tBinding this process to CPU #0.\n"
+            "\tactive mask is %lx, setting it to mask=%lx\n",
+            nr_cpu_ids,
+            raw_smp_processor_id(), cpu_active_mask->bits[0], mask.bits[0]);
+        ret = set_cpus_allowed_ptr(current, &mask);
+        if (0 != ret)
+                LOG(KERN_INFO "set_cpus_allowed_ptr=%d.\n", ret);
+        LOG(KERN_INFO "And now we are on CPU #%d", raw_smp_processor_id());
 
-	return ret;
+        return ret;
 }
 
 MODULE_LICENSE("GPL v2");

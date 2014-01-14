@@ -9,7 +9,7 @@
 export USER_BOOT_SPLASH=y
 
 echo "Move to our working directory first"
-cd /home/umberto1978/android/speedwizz_kernel_N2
+cd /home/umberto1978/android/TEST_4.3/GT-N7100_JB_Opensource_Update3/kernel2
 echo "Done"
 sleep 3
 
@@ -21,17 +21,12 @@ echo "Done"
 sleep 3
 
 echo "Perform a working config"
-make speedwizz_test_defconfig
+make speedwizz_defconfig
 echo "Done"
 sleep 3
 
 echo "Start compiling..."
 make 
-echo "Done"
-sleep 3
-
-echo "Compile modules twice, just to be sure"
-make modules CFLAGS_MODULE=-fno-pic
 echo "Done"
 sleep 3
 
@@ -49,7 +44,7 @@ echo "Done"
 sleep 3
 
 echo "Now move to source directory and copy new zImage to the compiled directory"
-cd /home/umberto1978/android/speedwizz_kernel_N2/arch/arm/boot
+cd /home/umberto1978/android/TEST_4.3/GT-N7100_JB_Opensource_Update3/kernel2/arch/arm/boot
 if [ -f zImage ]; then cp zImage /home/umberto1978/android/compiled/;
 echo "Done, zImage copied";
 else echo "No zImage found!! Exiting program!";
@@ -62,7 +57,7 @@ cd /home/umberto1978/android/compiled
 if [ -d modules ]; then rm -rf modules;
 fi
 mkdir /home/umberto1978/android/compiled/modules;
-cd /home/umberto1978/android/speedwizz_kernel_N2
+cd /home/umberto1978/android/TEST_4.3/GT-N7100_JB_Opensource_Update3/kernel2/drivers
 find . -name "*.ko" -exec cp {} /home/umberto1978/android/compiled/modules/ \;
 echo "done"
 sleep 3
@@ -97,7 +92,7 @@ echo "now pack ramdisk"
 cd /home/umberto1978/android/boot-images
 rm *.img
 cd /home/umberto1978/android/ramdisk-folder
-find . | cpio -o -H newc | gzip > /home/umberto1978/android/boot-images/ramdisk.cpio.gz
+find . | cpio -o -H newc | lzma > /home/umberto1978/android/boot-images/ramdisk.cpio.gz
 cd /home/umberto1978/android/boot-images
 mv ramdisk.cpio.gz initrd.img
 echo "Done"
@@ -118,8 +113,15 @@ cd /home/umberto1978/android/boot-images
 mv newBoot.img /home/umberto1978/android/build/boot.img
 echo "now compiling zip and Tar flashables"
 cd /home/umberto1978/android/build
-zip -r speedwizz_kernel_N2_`date +"%Y-%m-%d-%H-%M-%S"` ./
-tar -H ustar -c boot.img > speedwizz_kernel_N2_`date +"%Y-%m-%d-%H-%M-%S"`.tar
+zip -r speedwizz_kernel_N2_ALPHA_`date +"%Y-%m-%d-%H-%M-%S"` ./
+tar -H ustar -c boot.img > speedwizz_kernel_N2_ALPHA_`date +"%Y-%m-%d-%H-%M-%S"`.tar
+echo "DONE!"
+sleep 3
+
+echo "Uploading zip and tar to my dropbox!"
+cd /home/umberto1978/android/TEST_4.3/GT-N7100_JB_Opensource_Update3/kernel2
+./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_ALPHA_*.zip test_kernel
+./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_ALPHA_*.tar test_kernel
 echo "DONE!"
 sleep 3
 exit

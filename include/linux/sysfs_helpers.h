@@ -11,43 +11,43 @@
 
 static inline int read_into(int *container, int size, const char *buf, size_t count)
 {
-	int i, j, t, n;
-	i=0; j=0; t=0; n=0;
+        int i, j, t, n;
+        i=0; j=0; t=0; n=0;
 
-	for(j = 0; j < size; j++)
-		*(container + j) = 0;
+        for(j = 0; j < size; j++)
+                *(container + j) = 0;
 
-	for(j = 0; i < count; i++) {
-		char c = buf[i];
-		if(c >= '0' && c <= '9') {
-			if(t < (j + 1)) 
-				t = j + 1;
-			if(t > size)
-				return -EINVAL;
-			*(container + j) *= 10;
-			*(container + j) += (c - '0');
-		} else if(c == ' ' || c == '\t' || c == '\n' ) {
-			if(*(container + j) != 0) {
-				if(n) {
-					*(container + j) *= -1;
-					n = 0;
-				}
-				j++;
-			}
-		} else if(c == '-') {
-			n = 1;
-		} else
-			break;
-	}
+        for(j = 0; i < count; i++) {
+                char c = buf[i];
+                if(c >= '0' && c <= '9') {
+                        if(t < (j + 1)) 
+                                t = j + 1;
+                        if(t > size)
+                                return -EINVAL;
+                        *(container + j) *= 10;
+                        *(container + j) += (c - '0');
+                } else if(c == ' ' || c == '\t' || c == '\n' ) {
+                        if(*(container + j) != 0) {
+                                if(n) {
+                                        *(container + j) *= -1;
+                                        n = 0;
+                                }
+                                j++;
+                        }
+                } else if(c == '-') {
+                        n = 1;
+                } else
+                        break;
+        }
 
-	if(n)
-		*(container + j) *= -1;
+        if(n)
+                *(container + j) *= -1;
 
-	return t;
+        return t;
 }
 
-#define sanitize_min_max(val, min, max)		\
-	if(val < min)				\
-		val = min;			\
-	if(val > max)				\
-		val = max;
+#define sanitize_min_max(val, min, max)                \
+        if(val < min)                                \
+                val = min;                        \
+        if(val > max)                                \
+                val = max;
