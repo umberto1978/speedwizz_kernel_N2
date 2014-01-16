@@ -86,6 +86,7 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/sched.h>
 
+ATOMIC_NOTIFIER_HEAD(migration_notifier_head);
 
 /*
  * Convert user-nice values [ -20 ... 0 ... 19 ]
