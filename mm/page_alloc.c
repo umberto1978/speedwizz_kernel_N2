@@ -207,31 +207,28 @@ static unsigned long __meminitdata nr_all_pages;
 static unsigned long __meminitdata dma_reserve;
 
 #ifdef CONFIG_ARCH_POPULATES_NODE_MAP
-  #ifndef CONFIG_HAVE_MEMBLOCK_NODE_MAP
-    /*
-     * MAX_ACTIVE_REGIONS determines the maximum number of distinct ranges
-     * of memory (RAM) that may be registered with add_active_range().
-     * Ranges passed to add_active_range() will be merged if possible so
-     * the number of times add_active_range() can be called is related to
-     * the number of nodes and the number of holes
-     */
-    #ifdef CONFIG_MAX_ACTIVE_REGIONS
-      /* Allow an architecture to set MAX_ACTIVE_REGIONS to save memory */
-      #define MAX_ACTIVE_REGIONS CONFIG_MAX_ACTIVE_REGIONS
+  /*
+   * MAX_ACTIVE_REGIONS determines the maximum number of distinct
+   * ranges of memory (RAM) that may be registered with add_active_range().
+   * Ranges passed to add_active_range() will be merged if possible
+   * so the number of times add_active_range() can be called is
+   * related to the number of nodes and the number of holes
+   */
+  #ifdef CONFIG_MAX_ACTIVE_REGIONS
+    /* Allow an architecture to set MAX_ACTIVE_REGIONS to save memory */
+    #define MAX_ACTIVE_REGIONS CONFIG_MAX_ACTIVE_REGIONS
+  #else
+    #if MAX_NUMNODES >= 32
+      /* If there can be many nodes, allow up to 50 holes per node */
+      #define MAX_ACTIVE_REGIONS (MAX_NUMNODES*50)
     #else
-      #if MAX_NUMNODES >= 32
-        /* If there can be many nodes, allow up to 50 holes per node */
-        #define MAX_ACTIVE_REGIONS (MAX_NUMNODES*50)
-      #else
-        /* By default, allow up to 256 distinct regions */
-        #define MAX_ACTIVE_REGIONS 256
-      #endif
+      /* By default, allow up to 256 distinct regions */
+      #define MAX_ACTIVE_REGIONS 256
     #endif
+  #endif
 
-    static struct node_active_region __meminitdata early_node_map[MAX_ACTIVE_REGIONS];
-    static int __meminitdata nr_nodemap_entries;
-#endif /* !CONFIG_HAVE_MEMBLOCK_NODE_MAP */
-
+  static struct node_active_region __meminitdata early_node_map[MAX_ACTIVE_REGIONS];
+  static int __meminitdata nr_nodemap_entries;
   static unsigned long __meminitdata arch_zone_lowest_possible_pfn[MAX_NR_ZONES];
   static unsigned long __meminitdata arch_zone_highest_possible_pfn[MAX_NR_ZONES];
   static unsigned long __initdata required_kernelcore;
@@ -2167,12 +2164,8 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
 	unsigned long did_some_progress;
 	bool sync_migration = false;
 #ifdef CONFIG_ANDROID_WIP
-#ifdef CONFIG_SEC_OOM_KILLER
-	unsigned long oom_invoke_timeout = jiffies + HZ/4;
-#else
-	unsigned long oom_invoke_timeout = jiffies + HZ;
-#endif /* CONFIG_SEC_OOM_KILLER */
-#endif /* CONFIG_ANDROID_WIP */
+	unsigned long start_tick = jiffies;
+#endif
 	bool deferred_compaction = false;
 
 	/*
@@ -2288,7 +2281,7 @@ rebalance:
 	 * ANDROID_WIP: If we are looping more than 1 second, consider OOM
 	 */
 #ifdef CONFIG_ANDROID_WIP
-#define SHOULD_CONSIDER_OOM !did_some_progress || time_after(jiffies, oom_invoke_timeout)
+#define SHOULD_CONSIDER_OOM !did_some_progress || time_after(jiffies, start_tick + HZ)
 #else
 #define SHOULD_CONSIDER_OOM !did_some_progress
 #endif
@@ -2299,7 +2292,7 @@ rebalance:
 #ifdef CONFIG_ANDROID_WIP
 			if (did_some_progress)
 				pr_info("time's up : calling "
-					"__alloc_pages_may_oom(o:%d, gfp:0x%x)\n", order, gfp_mask);
+						"__alloc_pages_may_oom\n");
 #endif
 			page = __alloc_pages_may_oom(gfp_mask, order,
 					zonelist, high_zoneidx,
@@ -2326,9 +2319,6 @@ rebalance:
 					goto nopage;
 			}
 
-#ifdef CONFIG_SEC_OOM_KILLER
-			oom_invoke_timeout = jiffies + HZ/4;
-#endif
 			goto restart;
 		}
 
@@ -2389,7 +2379,7 @@ __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order,
 	struct zone *preferred_zone;
 	struct page *page = NULL;
 	int migratetype = allocflags_to_migratetype(gfp_mask);
-        unsigned int cpuset_mems_cookie;
+	unsigned int cpuset_mems_cookie;
 
 	gfp_mask &= gfp_allowed_mask;
 
@@ -2654,7 +2644,6 @@ void si_meminfo_node(struct sysinfo *val, int nid)
 	val->mem_unit = PAGE_SIZE;
 }
 #endif
-	bool deferred_compaction = false;
 
 /*
  * Determine whether the node should be displayed or not, depending on whether
@@ -4088,13 +4077,13 @@ u64 __init find_memory_core_early(int nid, u64 size, u64 align,
 
 		addr = memblock_find_in_range(final_start, final_end, size, align);
 
-		if (!addr)
+		if (addr == MEMBLOCK_ERROR)
 			continue;
 
 		return addr;
 	}
 
-	return 0;
+	return MEMBLOCK_ERROR;
 }
 #endif
 
@@ -4634,7 +4623,6 @@ static inline void setup_nr_node_ids(void)
 }
 #endif
 
-#ifndef CONFIG_HAVE_MEMBLOCK_NODE_MAP
 /**
  * add_active_range - Register a range of PFNs backed by physical memory
  * @nid: The node ID the range resides on
@@ -4798,11 +4786,6 @@ void __init sort_node_map(void)
 			sizeof(struct node_active_region),
 			cmp_node_active_region, NULL);
 }
-#else /* !CONFIG_HAVE_MEMBLOCK_NODE_MAP */
-static inline void sort_node_map(void)
-{
-}
-#endif
 
 /* Find the lowest pfn for a node */
 static unsigned long __init find_min_pfn_for_node(int nid)

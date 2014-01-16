@@ -373,12 +373,12 @@ static void free_css_set_work(struct work_struct *work)
 		 * rcu_read_lock is used to keep it alive.
 		 */
 		rcu_read_lock();
-		if (atomic_dec_and_test(&cgrp->count)) {
+		if (atomic_dec_and_test(&cgrp->count) &&
+		    notify_on_release(cgrp)) {
 			check_for_release(cgrp);
 			cgroup_wakeup_rmdir_waiter(cgrp);
 		}
 		rcu_read_unlock();
-
 		kfree(link);
 	}
 	write_unlock(&css_set_lock);

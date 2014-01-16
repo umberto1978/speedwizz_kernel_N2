@@ -129,6 +129,7 @@ static void wm8958_micd_set_rate(struct snd_soc_codec *codec)
 
 static int wm8994_readable(struct snd_soc_codec *codec, unsigned int reg)
 {
+	struct wm8994_priv *wm8994 = snd_soc_codec_get_drvdata(codec);
 	struct wm8994 *control = codec->control_data;
 
 	switch (reg) {
@@ -2793,7 +2794,7 @@ static int wm8994_hw_params(struct snd_pcm_substream *substream,
 		return -EINVAL;
 	}
 
-	bclk_rate = params_rate(params) * 4;
+	bclk_rate = params_rate(params) * 2;
 	switch (params_format(params)) {
 	case SNDRV_PCM_FORMAT_S16_LE:
 		bclk_rate *= 16;
@@ -4414,3 +4415,4 @@ MODULE_DESCRIPTION("ASoC WM8994 driver");
 MODULE_AUTHOR("Mark Brown <broonie@opensource.wolfsonmicro.com>");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:wm8994-codec");
+
