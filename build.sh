@@ -113,15 +113,15 @@ cd /home/umberto1978/android/boot-images
 mv newBoot.img /home/umberto1978/android/build/boot.img
 echo "now compiling zip and Tar flashables"
 cd /home/umberto1978/android/build
-zip -r speedwizz_kernel_N2_ALPHA_`date +"%Y-%m-%d-%H-%M-%S"` ./
-tar -H ustar -c boot.img > speedwizz_kernel_N2_ALPHA_`date +"%Y-%m-%d-%H-%M-%S"`.tar
+zip -r speedwizz_kernel_N2_BETA_`date +"%Y-%m-%d-%H-%M-%S"` ./
+tar -H ustar -c boot.img > speedwizz_kernel_N2_BETA_`date +"%Y-%m-%d-%H-%M-%S"`.tar
 echo "DONE!"
 sleep 3
 
 echo "Uploading zip and tar to my dropbox!"
 cd /home/umberto1978/android/jb_4-3/speedwizz_kernel_N2
-./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_ALPHA_*.zip test_kernel
-./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_ALPHA_*.tar test_kernel
+./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_BETA_*.zip test_kernel
+./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_BETA_*.tar test_kernel
 echo "DONE!"
 sleep 3
 exit
