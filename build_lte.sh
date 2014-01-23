@@ -21,7 +21,7 @@ echo "Done"
 sleep 3
 
 echo "Perform a working config"
-make speedwizz_defconfig
+make speedwizz_LTE_defconfig
 echo "Done"
 sleep 3
 
@@ -33,10 +33,10 @@ sleep 3
 #Copy the compiled zImage on a building directory for later usage
 echo "Create a directory for compiled images and check his content"
 cd /home/umberto1978/android
-if [ -d compiled ]; then cd /home/umberto1978/android/compiled;
+if [ -d compiled-lte ]; then cd /home/umberto1978/android/compiled-lte;
 else
-mkdir compiled;
-cd /home/umberto1978/android/compiled;
+mkdir compiled-lte;
+cd /home/umberto1978/android/compiled-lte;
 fi
 if [ -f zImage ]; then rm zImage;
 fi
@@ -45,7 +45,7 @@ sleep 3
 
 echo "Now move to source directory and copy new zImage to the compiled directory"
 cd /home/umberto1978/android/jb_4-3/speedwizz_kernel_N2/arch/arm/boot
-if [ -f zImage ]; then cp zImage /home/umberto1978/android/compiled/;
+if [ -f zImage ]; then cp zImage /home/umberto1978/android/compiled-lte/;
 echo "Done, zImage copied";
 else echo "No zImage found!! Exiting program!";
 exit;
@@ -53,12 +53,12 @@ fi
 sleep 3
 
 echo "Now copy the newly compiled modules to compiled directory as well"
-cd /home/umberto1978/android/compiled
+cd /home/umberto1978/android/compiled-lte
 if [ -d modules ]; then rm -rf modules;
 fi
-mkdir /home/umberto1978/android/compiled/modules;
+mkdir /home/umberto1978/android/compiled-lte/modules;
 cd /home/umberto1978/android/jb_4-3/speedwizz_kernel_N2/drivers
-find . -name "*.ko" -exec cp {} /home/umberto1978/android/compiled/modules/ \;
+find . -name "*.ko" -exec cp {} /home/umberto1978/android/compiled-lte/modules/ \;
 echo "done"
 sleep 3
 
@@ -75,63 +75,55 @@ rm -f mvpkm*
 rm -f pvtcpkm*
 rm -f dhd*
 rm -f scsi_wait_scan*
-cd /home/umberto1978/android/boot-images
+cd /home/umberto1978/android/boot-images-lte
 rm -f *zImage*
 echo "Done"
 sleep 3
 
 echo "copy new modules and zImage"
-cd /home/umberto1978/android/compiled/modules
+cd /home/umberto1978/android/compiled-lte/modules
 find . -name "*.ko" -exec cp {} /home/umberto1978/android/ramdisk-folder/lib/modules/ \;
-cd /home/umberto1978/android/compiled
-cp zImage /home/umberto1978/android/boot-images/new_zImage
+cd /home/umberto1978/android/compiled-lte
+cp zImage /home/umberto1978/android/boot-images-lte/new_zImage
 echo "Done"
 sleep 3
 
 echo "now pack ramdisk"
-cd /home/umberto1978/android/boot-images
+cd /home/umberto1978/android/boot-images-lte
 rm *.img
 cd /home/umberto1978/android/ramdisk-folder
-find . | cpio -o -H newc | lzma > /home/umberto1978/android/boot-images/ramdisk.cpio.gz
-cd /home/umberto1978/android/boot-images
+find . | cpio -o -H newc | lzma > /home/umberto1978/android/boot-images-lte/ramdisk.cpio.gz
+cd /home/umberto1978/android/boot-images-lte
 mv ramdisk.cpio.gz initrd.img
 echo "Done"
 sleep 3
 
 echo "now build boot.img"
-cd /home/umberto1978/android/boot-images
+cd /home/umberto1978/android/boot-images-lte
 ./mkbootimg.Linux.x86_64 --kernel new_zImage --ramdisk initrd.img -o newBoot.img --base 0x10000000
 echo "Done"
 sleep 3
 
 echo "Moving boot.img"
-cd /home/umberto1978/android/build
+cd /home/umberto1978/android/build-lte
 rm -f *.img
-find . -name "*.zip" -exec mv {} /home/umberto1978/android/released/ \;
-find . -name "*.tar" -exec mv {} /home/umberto1978/android/released/ \;
-cd /home/umberto1978/android/boot-images
-mv newBoot.img /home/umberto1978/android/build/boot.img
+find . -name "*.zip" -exec mv {} /home/umberto1978/android/released-lte/ \;
+find . -name "*.tar" -exec mv {} /home/umberto1978/android/released-lte/ \;
+cd /home/umberto1978/android/boot-images-lte
+mv newBoot.img /home/umberto1978/android/build-lte/boot.img
 echo "now compiling zip and Tar flashables"
-cd /home/umberto1978/android/build
-zip -r speedwizz_kernel_N2_BETA_`date +"%Y-%m-%d-%H-%M-%S"` ./
-tar -H ustar -c boot.img > speedwizz_kernel_N2_BETA_`date +"%Y-%m-%d-%H-%M-%S"`.tar
+cd /home/umberto1978/android/build-lte
+zip -r speedwizz_kernel_N2_LTE_BETA_`date +"%Y-%m-%d-%H-%M-%S"` ./
+tar -H ustar -c boot.img > speedwizz_kernel_N2_LTE_BETA_`date +"%Y-%m-%d-%H-%M-%S"`.tar
 echo "DONE!"
 sleep 3
 
 echo "Uploading zip and tar to my dropbox!"
 cd /home/umberto1978/android/jb_4-3/speedwizz_kernel_N2
-./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_BETA_*.zip test_kernel
-./dropbox_uploader.sh upload /home/umberto1978/android/build/speedwizz_kernel_N2_BETA_*.tar test_kernel
+./dropbox_uploader.sh upload /home/umberto1978/android/build-lte/speedwizz_kernel_N2_LTE_BETA_*.zip test_kernel
+./dropbox_uploader.sh upload /home/umberto1978/android/build-lte/speedwizz_kernel_N2_LTE_BETA_*.tar test_kernel
 echo "DONE!"
 sleep 3
-
-echo "Now build for LTE models..."
-./build-lte.sh
-sleep 3
-
-echo "All tasks succesfully completed!!"
-sleep 3
-
 exit
 
 
