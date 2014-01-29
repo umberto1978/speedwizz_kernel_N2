@@ -592,8 +592,8 @@ static void exynos4x12_set_bus_volt(void)
 
 void exynos4x12_target(int index)
 {
-	unsigned int tmp; // val;
-	
+	unsigned int tmp, val;
+
 	sec_debug_aux_log(SEC_DEBUG_AUXLOG_CPU_BUS_CLOCK_CHANGE,
 			"%s: div_index=%d(%ps)", __func__, index,
 			__builtin_return_address(0));

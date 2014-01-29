@@ -2338,7 +2338,7 @@ static int mmc_blk_alloc_part(struct mmc_card *card,
 	return 0;
 }
 
-static __maybe_unused int mmc_blk_alloc_parts(struct mmc_card *card, struct mmc_blk_data *md)
+static int mmc_blk_alloc_parts(struct mmc_card *card, struct mmc_blk_data *md)
 {
 	int ret = 0;
 

@@ -377,7 +377,7 @@ static ssize_t tmu_store_print_state(struct device *dev,
 
 	return ret;
 }
-static __maybe_unused DEVICE_ATTR(print_state, S_IRUGO | S_IWUSR,\
+static DEVICE_ATTR(print_state, S_IRUGO | S_IWUSR,\
 	tmu_show_print_state, tmu_store_print_state);
 
 void set_refresh_rate(unsigned int auto_refresh)

@@ -648,7 +648,7 @@ void ErrorTrap(unsigned char bErrorNumber)
 
 int ISSP_main(struct touchkey_i2c *tkey_i2c)
 {
-	//unsigned long flags;
+	unsigned long flags;
 
 	issp_tkey_i2c = tkey_i2c;
 

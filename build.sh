@@ -26,7 +26,7 @@ echo "Done"
 sleep 3
 
 echo "Start compiling..."
-make 
+make
 echo "Done"
 sleep 3
 
@@ -126,7 +126,7 @@ echo "DONE!"
 sleep 3
 
 echo "Now build for LTE models..."
-./build-lte.sh
+./build_lte.sh
 sleep 3
 
 echo "All tasks succesfully completed!!"

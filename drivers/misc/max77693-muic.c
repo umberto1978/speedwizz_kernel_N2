@@ -313,7 +313,7 @@ static int max77693_muic_set_comp2_comn1_pass2
 	return ret;
 }
 
-static int max77693_muic_set_usb_path_pass2
+static __maybe_unused int max77693_muic_set_usb_path_pass2
 	(struct max77693_muic_info *info, int path)
 {
 	int ret = 0;
@@ -323,7 +323,7 @@ static int max77693_muic_set_usb_path_pass2
 	return ret;
 }
 
-static int max77693_muic_get_usb_path_pass2
+static __maybe_unused int max77693_muic_get_usb_path_pass2
 	(struct max77693_muic_info *info)
 {
 	u8 val;
@@ -349,7 +349,7 @@ static int max77693_muic_set_uart_path_pass2
 
 }
 
-static int max77693_muic_get_uart_path_pass2
+static __maybe_unused int max77693_muic_get_uart_path_pass2
 	(struct max77693_muic_info *info)
 {
 	u8 val;
@@ -3105,7 +3105,7 @@ static void max77693_muic_mhl_detect(struct work_struct *work)
 
 static int uart_switch_init(struct max77693_muic_info *info)
 {
-	int ret, val;
+	//int ret; //val;
 
 #if !defined(CONFIG_MACH_T0) && !defined(CONFIG_MACH_M3) \
 	&& !defined(CONFIG_MACH_SLP_T0_LTE)

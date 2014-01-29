@@ -1202,7 +1202,7 @@ void mhl_path_enable(struct sii9234_data *sii9234, bool path_en)
 #endif
 }
 
-static __maybe_unused void cbus_handle_wrt_burst_recd(struct sii9234_data *sii9234)
+static void cbus_handle_wrt_burst_recd(struct sii9234_data *sii9234)
 {
 	pr_debug("sii9234: CBUS WRT_BURST_RECD\n");
 }
@@ -3036,7 +3036,7 @@ static void cbus_command_response_dbg_msg(struct sii9234_data *sii9234,
 }
 #endif
 
-static __maybe_unused void cbus_command_response_all(struct sii9234_data *sii9234)
+static void cbus_command_response_all(struct sii9234_data *sii9234)
 {
 	u8 index;
 	struct cbus_packet cbus_pkt_process_buf[CBUS_PKT_BUF_COUNT];
@@ -3873,7 +3873,7 @@ static ssize_t sysfs_mhl_read_reg_store(struct device *dev,
 	return size;
 }
 
-static __maybe_unused DEVICE_ATTR(mhl_read_reg, S_IRUGO | S_IWUSR,
+static DEVICE_ATTR(mhl_read_reg, S_IRUGO | S_IWUSR,
 		   sysfs_mhl_read_reg_show, sysfs_mhl_read_reg_store);
 
 #ifdef __CONFIG_MHL_DEBUG__
@@ -4249,7 +4249,7 @@ err_extcon:
 #ifdef __CONFIG_MHL_SWING_LEVEL__
 	class_remove_file(sec_mhl, &class_attr_swing);
 #endif
- //err_exit2b:
+ err_exit2b:
 #ifdef __CONFIG_SS_FACTORY__
 	class_remove_file(sec_mhl, &class_attr_test_result);
 #endif

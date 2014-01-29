@@ -26,7 +26,7 @@ echo "Done"
 sleep 3
 
 echo "Start compiling..."
-make 
+make
 echo "Done"
 sleep 3
 
@@ -63,11 +63,11 @@ echo "done"
 sleep 3
 
 echo "now build ramdisk"
-cd /home/umberto1978/android/ramdisk-folder
+cd /home/umberto1978/android/ramdisk-folder-lte
 sleep 3
 
 echo "erasing old modules and zImage"
-cd /home/umberto1978/android/ramdisk-folder/lib/modules
+cd /home/umberto1978/android/ramdisk-folder-lte/lib/modules
 rm -f btlock*
 rm -f commkm*
 rm -f logger*
@@ -82,7 +82,7 @@ sleep 3
 
 echo "copy new modules and zImage"
 cd /home/umberto1978/android/compiled-lte/modules
-find . -name "*.ko" -exec cp {} /home/umberto1978/android/ramdisk-folder/lib/modules/ \;
+find . -name "*.ko" -exec cp {} /home/umberto1978/android/ramdisk-folder-lte/lib/modules/ \;
 cd /home/umberto1978/android/compiled-lte
 cp zImage /home/umberto1978/android/boot-images-lte/new_zImage
 echo "Done"
@@ -91,7 +91,7 @@ sleep 3
 echo "now pack ramdisk"
 cd /home/umberto1978/android/boot-images-lte
 rm *.img
-cd /home/umberto1978/android/ramdisk-folder
+cd /home/umberto1978/android/ramdisk-folder-lte
 find . | cpio -o -H newc | lzma > /home/umberto1978/android/boot-images-lte/ramdisk.cpio.gz
 cd /home/umberto1978/android/boot-images-lte
 mv ramdisk.cpio.gz initrd.img

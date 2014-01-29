@@ -140,7 +140,10 @@ static void usb_config_work_func(struct work_struct *work)
 {
 	struct diag_context *ctxt = container_of(work,
 			struct diag_context, config_work);
-	
+	struct usb_composite_dev *cdev = ctxt->cdev;
+	struct usb_gadget_strings *table;
+	struct usb_string *s;
+
 	if (ctxt->ch.notify)
 	{
 		ctxt->ch.notify(ctxt->ch.priv, USB_DIAG_CONNECT, NULL);

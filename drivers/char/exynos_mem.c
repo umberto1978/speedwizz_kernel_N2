@@ -147,7 +147,7 @@ outer_cache_ops:
 	}
 }
 
-static __maybe_unused void exynos_mem_paddr_cache_clean(dma_addr_t start, size_t length)
+static void exynos_mem_paddr_cache_clean(dma_addr_t start, size_t length)
 {
 	if (length > (size_t) L2_FLUSH_ALL) {
 		flush_cache_all();		/* L1 */

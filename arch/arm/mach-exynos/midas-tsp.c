@@ -1664,7 +1664,7 @@ int melfas_power(bool on)
 {
 	struct regulator *regulator_vdd;
 	struct regulator *regulator_avdd;
-	//int ret;
+	int ret;
 	if (enabled == on)
 		return 0;
 
@@ -2677,8 +2677,9 @@ int TSP_VDD_18V(bool on)
 int melfas_power(bool on)
 {
 	struct regulator *regulator;
+	int ret;
 	if (enabled == on)
-	  return 0;
+		return 0;
 
 	regulator = regulator_get(NULL, "touch");
 	if (IS_ERR(regulator))

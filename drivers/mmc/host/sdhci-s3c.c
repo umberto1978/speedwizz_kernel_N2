@@ -349,7 +349,7 @@ static void sdhci_s3c_vtf_on_off(int on_off)
 }
 
 
-static __maybe_unused int sdhci_s3c_get_card_exist(struct sdhci_host *host)
+static int sdhci_s3c_get_card_exist(struct sdhci_host *host)
 {
 	struct sdhci_s3c *sc;
 	int status;

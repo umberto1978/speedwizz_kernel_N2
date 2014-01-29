@@ -607,7 +607,7 @@ static int mshci_s3c_resume(struct platform_device *dev)
 	return 0;
 }
 
-static __maybe_unused void mshci_s3c_shutdown(struct platform_device *dev, pm_message_t pm)
+static void mshci_s3c_shutdown(struct platform_device *dev, pm_message_t pm)
 {
 	struct mshci_host *host = platform_get_drvdata(dev);
 	struct s3c_mshci_platdata *pdata = dev->dev.platform_data;
