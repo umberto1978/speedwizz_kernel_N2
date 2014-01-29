@@ -109,6 +109,8 @@ cd /home/umberto1978/android/build
 rm -f *.img
 find . -name "*.zip" -exec mv {} /home/umberto1978/android/released/ \;
 find . -name "*.tar" -exec mv {} /home/umberto1978/android/released/ \;
+find . -name "*_N2_LTE_BETA_*.zip" -exec mv {} /home/umberto1978/android/released-lte/ \;
+find . -name "*_N2_LTE_BETA_*.tar" -exec mv {} /home/umberto1978/android/released-lte/ \;
 cd /home/umberto1978/android/boot-images
 mv newBoot.img /home/umberto1978/android/build/boot.img
 echo "now compiling zip and Tar flashables"
